@@ -23,6 +23,8 @@
                             orange: '#f77f00',
                             orangeHover: '#d96e00',
                             lightBg: '#f8fafc',
+                            wechat: '#07c160',
+                            wechatHover: '#06ad56'
                         }
                     },
                     fontFamily: {
@@ -34,7 +36,7 @@
     </script>
     <style>
         .glass-header {
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.94);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
@@ -46,40 +48,48 @@
         }
         .card-hover:hover {
             transform: translateY(-5px);
-            box-shadow: 0 12px 24px -10px rgba(15, 52, 96, 0.15);
+            box-shadow: 0 16px 30px -10px rgba(15, 52, 96, 0.2);
         }
-        /* Toast 提示框动画 */
-        #toastNotice {
-            transition: opacity 0.3s ease, transform 0.3s ease;
+        .pulse-subtle {
+            animation: pulse-ring 2s infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(7, 193, 96, 0.6); }
+            70% { transform: scale(1); box-shadow: 0 0 0 12px rgba(7, 193, 96, 0); }
+            100% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(7, 193, 96, 0); }
         }
     </style>
 </head>
 <body class="bg-brand-lightBg text-slate-800 font-sans antialiased flex flex-col min-h-screen relative">
 
-    <!-- Toast 复制/拨号全局提示框 -->
-    <div id="toastNotice" class="fixed bottom-6 right-6 z-50 transform translate-y-10 opacity-0 pointer-events-none bg-slate-900/90 backdrop-blur text-white px-5 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-3">
-        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
-        <span id="toastMsg" class="text-sm font-semibold"></span>
+    <!-- Notification Toast Message Box -->
+    <div id="copyToast" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] hidden bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-slate-700 text-sm font-semibold transition-all">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toastText">WeChat ID Copied to Clipboard!</span>
     </div>
 
-    <!-- Top Announcement Bar -->
-    <div class="bg-brand-navyDark text-white text-xs py-2 px-4">
+    <!-- Top Announcement & Quick Direct Contact Bar -->
+    <div class="bg-brand-navyDark text-white text-xs py-2.5 px-4 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 text-center sm:text-left">
             <div class="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
                 <span><i class="fa-solid fa-certificate text-brand-cyan mr-1"></i> <span data-i18n="topBarDuty">Form E & RCEP 0-5% Duty-Free Certificate Supported</span></span>
-                <span class="hidden md:inline">|</span>
+                <span class="hidden md:inline text-slate-500">|</span>
                 <span class="hidden md:inline"><i class="fa-solid fa-truck-fast text-brand-orange mr-1"></i> <span data-i18n="topBarDDP">DDP Shipping to SE Asia & Worldwide</span></span>
             </div>
-            <div class="flex items-center gap-3">
-                <button onclick="copyWeChat('13802694295')" class="hover:text-brand-cyan transition-colors flex items-center gap-1 cursor-pointer">
-                    <i class="fa-brands fa-weixin text-emerald-400"></i> WeChat: +86 138 0269 4295 <i class="fa-regular fa-copy text-[10px] opacity-70 ml-0.5"></i>
+            <!-- Prominent Direct Contact Links -->
+            <div class="flex items-center gap-3 flex-wrap justify-center">
+                <button onclick="copyWeChat('13802694295')" class="hover:text-emerald-400 bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-md transition-all flex items-center gap-1.5 font-medium">
+                    <i class="fa-brands fa-weixin text-brand-wechat"></i> WeChat: 13802694295 <i class="fa-regular fa-copy text-[10px] opacity-70"></i>
                 </button>
+                <a href="tel:+8613802694295" class="hover:text-brand-cyan bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-md transition-all flex items-center gap-1.5 font-medium">
+                    <i class="fa-solid fa-phone text-brand-cyan"></i> Tel: +86 138 0269 4295
+                </a>
             </div>
         </div>
     </div>
 
     <!-- Navigation Header -->
-    <header class="sticky top-0 z-50 glass-header border-b border-slate-200/80 transition-all">
+    <header class="sticky top-[33px] sm:top-[33px] z-40 glass-header border-b border-slate-200/80 transition-all">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             
             <!-- Logo -->
@@ -102,13 +112,19 @@
                 <a href="#contact" class="hover:text-brand-navy transition-colors py-1" data-i18n="navContact">Contact</a>
             </nav>
 
-            <!-- Top Right Utilities (Lang Switcher & Quick CTA) -->
+            <!-- Top Right Utilities (Lang Switcher & Quick CTA Button) -->
             <div class="flex items-center gap-3">
+                <!-- Direct WeChat Button Header -->
+                <button onclick="copyWeChat('13802694295')" class="hidden sm:inline-flex items-center gap-2 bg-brand-wechat hover:bg-brand-wechatHover text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow transition-all">
+                    <i class="fa-brands fa-weixin text-base"></i>
+                    <span data-i18n="headWeChatBtn">Add WeChat</span>
+                </button>
+
                 <!-- Language Selector Dropdown -->
                 <div class="relative">
                     <select id="langSelect" onchange="changeLanguage(this.value)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2 px-3 pr-7 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-cyan cursor-pointer appearance-none">
-                        <option value="en">🌐 English</option>
                         <option value="zh">🇨🇳 中文 (Chinese)</option>
+                        <option value="en">🌐 English</option>
                         <option value="vi">🇻🇳 Tiếng Việt</option>
                         <option value="th">🇹🇭 ไทย (Thai)</option>
                         <option value="id">🇮🇩 B. Indonesia</option>
@@ -130,10 +146,14 @@
             <a href="#advantages" onclick="toggleMobileMenu()" class="block py-2 text-slate-700 font-medium" data-i18n="navAdvantages">Why Us</a>
             <a href="#about" onclick="toggleMobileMenu()" class="block py-2 text-slate-700 font-medium" data-i18n="navAbout">About Us</a>
             <a href="#contact" onclick="toggleMobileMenu()" class="block py-2 text-slate-700 font-medium" data-i18n="navContact">Contact</a>
-            <div class="pt-2">
-                <button onclick="copyWeChat('13802694295')" class="w-full flex items-center justify-center gap-2 bg-emerald-600 text-white font-bold py-2.5 rounded-lg shadow">
-                    <i class="fa-brands fa-weixin text-lg"></i> WeChat : 13802694295 <i class="fa-regular fa-copy text-xs opacity-80"></i>
+            
+            <div class="pt-3 border-t border-slate-100 grid grid-cols-2 gap-2">
+                <button onclick="copyWeChat('13802694295')" class="w-full flex items-center justify-center gap-2 bg-brand-wechat text-white font-bold py-2.5 rounded-xl shadow text-xs">
+                    <i class="fa-brands fa-weixin text-base"></i> <span data-i18n="wechatCallBtn">微信咨询</span>
                 </button>
+                <a href="tel:+8613802694295" class="w-full flex items-center justify-center gap-2 bg-brand-navy text-white font-bold py-2.5 rounded-xl shadow text-xs">
+                    <i class="fa-solid fa-phone text-base"></i> <span data-i18n="phoneCallBtn">电话直连</span>
+                </a>
             </div>
         </div>
     </header>
@@ -143,7 +163,6 @@
 
         <!-- Hero Section -->
         <section id="home" class="hero-gradient text-white relative overflow-hidden py-16 lg:py-24">
-            <!-- Decorative Glow Elements -->
             <div class="absolute -top-24 -left-24 w-96 h-96 bg-brand-teal/20 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-brand-cyan/20 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -152,17 +171,17 @@
                     
                     <!-- Left Hero Text -->
                     <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
-                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur border border-white/20 text-brand-cyan text-xs font-semibold tracking-wide uppercase">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur border border-white/20 text-brand-cyan text-xs font-semibold tracking-wide uppercase">
                             <i class="fa-solid fa-shield-halved"></i>
                             <span data-i18n="heroTag">Direct Factory Supply • Xiaolan, China</span>
                         </div>
 
                         <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight" data-i18n="heroTitle">
-                            One-Stop Flexible & Industrial Packaging Solutions
+                            一站式软包装与工业包装出海解决方案
                         </h1>
 
                         <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed" data-i18n="heroDesc">
-                            Empowering global e-commerce, garment, and industrial clients with premium stretch film, custom poly bags, CPE zipper pouches, and eco-friendly mailers.
+                            为全球跨境电商、服装品牌及工业客户提供高品质拉伸膜、CPE磨砂拉链袋、PE/PO平口袋及气泡缓冲袋。
                         </p>
 
                         <!-- Highlights Badge Row -->
@@ -185,73 +204,72 @@
                             </div>
                         </div>
 
-                        <!-- Action Buttons -->
+                        <!-- Main Primary Hero Action Buttons Emphasis on WeChat & Phone -->
                         <div class="pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                            <button onclick="copyWeChat('13802694295')" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-7 py-3.5 rounded-xl shadow-lg hover:shadow-emerald-500/25 transition-all text-base cursor-pointer">
-                                <i class="fa-brands fa-weixin text-xl"></i>
-                                <span data-i18n="heroBtnWhatsApp">WeChat ID 13802694295</span>
-                                <i class="fa-regular fa-copy text-xs opacity-80 ml-1"></i>
+                            <!-- WeChat Consultation Hero Button -->
+                            <button onclick="copyWeChat('13802694295')" class="pulse-subtle w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-brand-wechat hover:bg-brand-wechatHover text-white font-extrabold px-7 py-4 rounded-xl shadow-lg hover:shadow-emerald-500/30 transition-all text-base">
+                                <i class="fa-brands fa-weixin text-2xl"></i>
+                                <span data-i18n="heroBtnWeChat">微信咨询: 13802694295</span>
                             </button>
-                            <a href="#products" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/30 font-semibold px-7 py-3.5 rounded-xl transition-all text-base backdrop-blur">
-                                <i class="fa-solid fa-box-open"></i>
-                                <span data-i18n="heroBtnSample">Explore Products</span>
+                            
+                            <!-- Phone Call Hero Button -->
+                            <a href="tel:+8613802694295" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold px-7 py-4 rounded-xl transition-all text-base backdrop-blur">
+                                <i class="fa-solid fa-phone-volume text-brand-cyan text-xl"></i>
+                                <span data-i18n="heroBtnPhone">电话直连: +86 138 0269 4295</span>
                             </a>
                         </div>
                     </div>
 
-                    <!-- Right Hero Direct Info Box -->
+                    <!-- Right Hero Direct Contact Card -->
                     <div class="lg:col-span-5">
                         <div class="bg-white text-slate-800 p-6 sm:p-8 rounded-2xl shadow-2xl border border-slate-100 relative space-y-6">
                             <div class="absolute -top-3 -right-3 bg-brand-orange text-white text-xs font-extrabold uppercase px-3 py-1 rounded-full shadow">
-                                Direct Factory
+                                Direct Factory Supply
                             </div>
                             
                             <h3 class="text-xl font-bold text-brand-navy flex items-center gap-2">
-                                <i class="fa-solid fa-address-book text-brand-teal"></i>
-                                <span data-i18n="directContactTitle">Direct Support & Contact</span>
+                                <i class="fa-solid fa-headset text-brand-teal"></i>
+                                <span data-i18n="directContactTitle">官方微信与电话快速通道</span>
                             </h3>
 
                             <p class="text-sm text-slate-600 leading-relaxed" data-i18n="directContactDesc">
-                                Connect directly with our Xiaolan supply team for high-quality packaging products and customized solutions.
+                                欢迎随时通过微信或电话与我们位于中山小榄的生产团队沟通，获取即时报价与样品寄送服务。
                             </p>
 
-                            <div class="space-y-4 pt-2">
+                            <!-- Interactive Quick Contact Buttons -->
+                            <div class="space-y-3.5 pt-1">
                                 <!-- WeChat Box -->
-                                <div onclick="copyWeChat('13802694295')" class="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-emerald-50/60 transition-colors rounded-xl border border-slate-200 cursor-pointer group">
+                                <div onclick="copyWeChat('13802694295')" class="group cursor-pointer flex items-center justify-between p-3.5 bg-emerald-50/70 hover:bg-emerald-100/80 rounded-xl border border-emerald-200 transition-all">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform">
+                                        <div class="w-11 h-11 rounded-lg bg-brand-wechat text-white flex items-center justify-center text-2xl shrink-0 shadow-sm">
                                             <i class="fa-brands fa-weixin"></i>
                                         </div>
                                         <div>
-                                            <div class="text-xs font-semibold text-slate-500 uppercase">WeChat ID</div>
-                                            <div class="text-base font-bold text-slate-800">13802694295</div>
+                                            <div class="text-xs font-semibold text-emerald-800 uppercase" data-i18n="wechatLabel">微信咨询号 (点击复制)</div>
+                                            <div class="text-lg font-extrabold text-slate-900 group-hover:text-emerald-700">13802694295</div>
                                         </div>
                                     </div>
-                                    <span class="text-xs font-semibold text-emerald-600 bg-emerald-100/80 px-2.5 py-1 rounded-md flex items-center gap-1 group-hover:bg-emerald-200 transition-colors">
-                                        <i class="fa-regular fa-copy"></i> <span data-i18n="clickCopy">Copy</span>
-                                    </span>
+                                    <span class="text-xs font-bold text-emerald-700 bg-white px-2.5 py-1 rounded-md border border-emerald-300 shadow-sm" data-i18n="copyBtnText">点击复制</span>
                                 </div>
 
                                 <!-- Phone Box -->
-                                <div onclick="copyAndCall('+8613802694295')" class="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-blue-50/60 transition-colors rounded-xl border border-slate-200 cursor-pointer group">
+                                <a href="tel:+8613802694295" class="group flex items-center justify-between p-3.5 bg-blue-50/70 hover:bg-blue-100/80 rounded-xl border border-blue-200 transition-all">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-lg bg-blue-100 text-brand-navy flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform">
+                                        <div class="w-11 h-11 rounded-lg bg-brand-navy text-white flex items-center justify-center text-2xl shrink-0 shadow-sm">
                                             <i class="fa-solid fa-phone"></i>
                                         </div>
                                         <div>
-                                            <div class="text-xs font-semibold text-slate-500 uppercase">Phone Contact</div>
-                                            <div class="text-base font-bold text-slate-800">+86 138 0269 4295</div>
+                                            <div class="text-xs font-semibold text-blue-800 uppercase" data-i18n="phoneLabel">24小时电话热线 (点击拨打)</div>
+                                            <div class="text-lg font-extrabold text-slate-900 group-hover:text-brand-navy">+86 138 0269 4295</div>
                                         </div>
                                     </div>
-                                    <span class="text-xs font-semibold text-brand-navy bg-blue-100/80 px-2.5 py-1 rounded-md flex items-center gap-1 group-hover:bg-blue-200 transition-colors">
-                                        <i class="fa-solid fa-phone-flip text-[10px]"></i> <span data-i18n="clickCall">Call</span>
-                                    </span>
-                                </div>
+                                    <span class="text-xs font-bold text-brand-navy bg-white px-2.5 py-1 rounded-md border border-blue-300 shadow-sm" data-i18n="callBtnText">拨打电话</span>
+                                </a>
                             </div>
 
-                            <a href="#contact" class="w-full bg-brand-navy hover:bg-brand-navyDark text-white font-bold py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm">
-                                <i class="fa-solid fa-location-dot"></i>
-                                <span data-i18n="viewContactBtn">View All Contact Information</span>
+                            <a href="#contact" class="w-full bg-slate-900 hover:bg-brand-navy text-white font-bold py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-xs">
+                                <i class="fa-solid fa-location-dot text-brand-cyan"></i>
+                                <span data-i18n="viewContactBtn">查看详细工厂地址与联系说明</span>
                             </a>
                         </div>
                     </div>
@@ -291,184 +309,298 @@
                 <!-- Section Title -->
                 <div class="text-center max-w-3xl mx-auto mb-12">
                     <h2 class="text-xs font-extrabold uppercase tracking-widest text-brand-teal mb-2" data-i18n="prodSubTitle">Full Spectrum Packaging Supplies</h2>
-                    <p class="text-3xl font-extrabold text-brand-navy sm:text-4xl" data-i18n="prodMainTitle">Our Industrial & Custom Packaging Products</p>
-                    <p class="text-slate-600 mt-3 text-sm sm:text-base" data-i18n="prodDesc">High durability, clear transparency, heavy loading capacity, and fully customizable for your brand requirements.</p>
+                    <p class="text-3xl font-extrabold text-brand-navy sm:text-4xl" data-i18n="prodMainTitle">工业包装与定制胶袋系列</p>
+                    <p class="text-slate-600 mt-3 text-sm sm:text-base" data-i18n="prodDesc">高透明度、强拉伸力、高承重力，完全支持根据品牌需求定制尺寸、厚度及 Logo 印刷。</p>
                 </div>
 
-                <!-- Product Cards Grid -->
+                <!-- Product Cards Grid with High Quality Real Product Photos -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
                     <!-- Product 1: Stretch Film -->
-                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between">
-                        <div class="p-6">
-                            <div class="w-12 h-12 rounded-xl bg-blue-50 text-brand-navy flex items-center justify-center text-2xl mb-4">
-                                <i class="fa-solid fa-boxes-packing"></i>
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between group">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                                <img src="https://images.openai.com/static-rsc-4/1i1PN45mHXrR9w_2LA7tM0hBjwyClSTzr6N70dJ08fRXVKsHfOzAV5rEOaxVof_dpw85AvfJyVeMxWY23AN6EXwXYCOh0cVaug_rhJhQ9i-4WrVPrEBOkw-ALMhR4uj4eOSVJt5vzj6fZOv4nsmGPwIZ85xAMXY22ZVCGPCzkP7EDJoCCdvURQI71Jg2FMLk?purpose=fullsize" class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"><img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80" 
+                                     alt="LLDPE Industrial Stretch Film Roll Wrap" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/0f3460/ffffff?text=Stretch+Film';" />
+                                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    100% Virgin LLDPE
+                                </div>
                             </div>
-                            <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p1Title">Stretch Film (拉伸膜)</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p1Desc">Hand & machine grade LLDPE stretch film. High puncture resistance, superior stretchability, and strong self-adhesion for pallet wrapping and cargo protection.</p>
-                            <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p1Spec1">Thickness: 15 - 50 Micron</span></li>
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p1Spec2">Color: Clear, Black, Blue</span></li>
-                            </ul>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p1Title">Stretch Film (拉伸膜)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p1Desc">Hand & machine grade LLDPE stretch film. High puncture resistance, superior stretchability, and strong self-adhesion for pallet wrapping and cargo protection.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p1Spec1">Thickness: 15 - 50 Micron</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p1Spec2">Color: Clear, Black, Blue</span></li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-500">Industrial Grade</span>
-                            <a href="#contact" class="text-xs font-bold text-brand-navy hover:underline" data-i18n="contactLink">Contact Us →</a>
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信询价</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话咨询</span>
+                            </a>
                         </div>
                     </div>
 
                     <!-- Product 2: Strapping Band -->
-                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between">
-                        <div class="p-6">
-                            <div class="w-12 h-12 rounded-xl bg-teal-50 text-brand-teal flex items-center justify-center text-2xl mb-4">
-                                <i class="fa-solid fa-tape"></i>
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between group">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                               <img src="https://images.openai.com/static-rsc-4/-vk_rcTnkVlwXy5WCi4TYWzzvp79DJAQLu5J8ucnZPYFpFVN6780_EM3Hnj6T-D70Fw74EcQR_mB4Wt_2XZjqZMxoPTmJDLZoFkLatSYoIKEgY0wjraOclmxjEGh2QrA9E9Xvof7CAIKiJWsUk_9_auynbKCKG19kr-wg9l7sYC46fsQ8_AYanuzRGH3cqwL?purpose=fullsize" alt="Strapping Band Rolls"> <img src="https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?auto=format&fit=crop&w=800&q=80" 
+                                     alt="PET PP Strapping Band Belts" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/2a9d8f/ffffff?text=Strapping+Band';" />
+                                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    Heavy Duty PET / PP
+                                </div>
                             </div>
-                            <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p2Title">Strapping Band (打包带)</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p2Desc">Heavy-duty PET & PP strapping belts for bundling cartons, timber, and heavy machinery. Compatible with automatic and manual strapping tools.</p>
-                            <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p2Spec1">Material: High Tensile PP / PET</span></li>
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p2Spec2">Custom Widths & Colors</span></li>
-                            </ul>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p2Title">Strapping Band (打包带)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p2Desc">Heavy-duty PET & PP strapping belts for bundling cartons, timber, and heavy machinery. Compatible with automatic and manual strapping tools.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p2Spec1">Material: High Tensile PP / PET</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p2Spec2">Custom Widths & Colors</span></li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-500">Heavy Duty</span>
-                            <a href="#contact" class="text-xs font-bold text-brand-navy hover:underline" data-i18n="contactLink">Contact Us →</a>
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信询价</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话咨询</span>
+                            </a>
                         </div>
                     </div>
 
                     <!-- Product 3: EPE Pearl Cotton -->
-                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between">
-                        <div class="p-6">
-                            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl mb-4">
-                                <i class="fa-solid fa-shield-cat"></i>
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between group">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                                <img src="https://images.openai.com/static-rsc-4/CmiULZVGhHeQUmJPMEo2XxgH2L7pVN_71vJCNLqMG0jo9jBZr7BhBAr1I-4zSK6jfsMBrVKBwALtiNqrtxL3lz9ABy0A-vT9YSg2ErYcxBmd3XbrTIuGPHYSvsjP_lZ766smsdpGT5nGixxfmbIlZzAM3AsbrdGDey_96vGoL1v-UARt_oeUMaBIQDh-3cNo?purpose=fullsize" class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"><img src="https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=800&q=80" 
+                                     alt="EPE Pearl Cotton Cushion Foam Sheet" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/f77f00/ffffff?text=EPE+Foam';" />
+                                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    Shockproof Cushion
+                                </div>
                             </div>
-                            <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p3Title">EPE Pearl Cotton Foam (珍珠棉)</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p3Desc">Shockproof, anti-scratch EPE foam sheets, rolls, and bags. Essential protection for hardware, electronics, lighting fixtures, and fragile goods.</p>
-                            <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p3Spec1">Custom Thickness & Foam Die-cuts</span></li>
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p3Spec2">Waterproof & Anti-Static Options</span></li>
-                            </ul>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p3Title">EPE Pearl Cotton Foam (珍珠棉)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p3Desc">Shockproof, anti-scratch EPE foam sheets, rolls, and bags. Essential protection for hardware, electronics, lighting fixtures, and fragile goods.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p3Spec1">Custom Thickness & Foam Die-cuts</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p3Spec2">Waterproof & Anti-Static Options</span></li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-500">Cushion Protection</span>
-                            <a href="#contact" class="text-xs font-bold text-brand-navy hover:underline" data-i18n="contactLink">Contact Us →</a>
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信询价</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话咨询</span>
+                            </a>
                         </div>
                     </div>
 
                     <!-- Product 4: Sealing Tape -->
-                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between">
-                        <div class="p-6">
-                            <div class="w-12 h-12 rounded-xl bg-sky-50 text-brand-cyan flex items-center justify-center text-2xl mb-4">
-                                <i class="fa-solid fa-box"></i>
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between group">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                                <img src="https://images.openai.com/static-rsc-4/5mVJVPqlwGg7J-m9BuPKDt3YDlTuu03DGvblQ1XIuKdAVxAtEoHpSFfeiDttMXA0d4Xk-bYWtHdf9BD9rlSYehDWb5Iaq7WSQJdmXBzvkQNd7zox1j8XuYjMbT9P_iU-MFnfjjgIED6NkH3VQCpI9ojHVtWvt0yRj9ozPZU4rkeuydngMqOLmEM7dHqJHuiY?purpose=fullsize" alt="Sealing BOPP Tapes" ><img src="https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=800&q=80" 
+                                     alt="BOPP Carton Sealing Tape Rolls" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/00b4d8/ffffff?text=Sealing+Tape';" />
+                                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    High Adhesion BOPP
+                                </div>
                             </div>
-                            <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p4Title">Sealing Tape / BOPP Tape (封箱胶)</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p4Desc">Strong acrylic adhesive BOPP carton sealing tape. Available in clear, tan, fragile warning print, and customized brand logo printing.</p>
-                            <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p4Spec1">Strong Adhesion & Weatherproof</span></li>
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p4Spec2">Custom Brand Logo Printing</span></li>
-                            </ul>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p4Title">Sealing Tape / BOPP Tape (封箱胶)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p4Desc">Strong acrylic adhesive BOPP carton sealing tape. Available in clear, tan, fragile warning print, and customized brand logo printing.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p4Spec1">Strong Adhesion & Weatherproof</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p4Spec2">Custom Brand Logo Printing</span></li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-500">Carton Packaging</span>
-                            <a href="#contact" class="text-xs font-bold text-brand-navy hover:underline" data-i18n="contactLink">Contact Us →</a>
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信询价</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话咨询</span>
+                            </a>
                         </div>
                     </div>
 
                     <!-- Product 5: Bubble Mailers & Bags -->
-                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between">
-                        <div class="p-6">
-                            <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl mb-4">
-                                <i class="fa-solid fa-envelope-open-text"></i>
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between group">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                                <img src="https://images.openai.com/static-rsc-4/oPG_WBo8s_vGpCT4TxmpiLPvFu3fVCV7JXHhOC66CqsWu0KSIijW4qgyxZv7EATJBCRe4o1LkG1oYxk9YfLWpCmD08F16MhPqs-avryQNW-49DHx_583T-f8PduVRL2n3lhI8rEJvOKwrC6ek4ph1hk7SnQN1xEr9cxvVlpVe9YCzr_aoLmNh7RJUlD9EYO2?purpose=fullsize" alt="Bubble Mailers and Pouches" ><img src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?auto=format&fit=crop&w=800&q=80" 
+                                     alt="Bubble Padded Shipping Mailer Envelopes" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/6366f1/ffffff?text=Bubble+Mailers';" />
+                                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    Padded Protective Envelope
+                                </div>
                             </div>
-                            <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p5Title">Bubble Mailers & Bags (气泡袋)</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p5Desc">Protective bubble wrap pouches and metallic/poly bubble mailers with self-adhesive destructive glue. Ideal for e-commerce, cosmetics, and electronics shipping.</p>
-                            <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p5Spec1">Tamper-Evident Strong Adhesive</span></li>
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p5Spec2">Shockproof Air Bubble Cushioning</span></li>
-                            </ul>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p5Title">Bubble Mailers & Bags (气泡袋)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p5Desc">Protective bubble wrap pouches and metallic/poly bubble mailers with self-adhesive destructive glue. Ideal for e-commerce, cosmetics, and electronics shipping.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p5Spec1">Tamper-Evident Strong Adhesive</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p5Spec2">Shockproof Air Bubble Cushioning</span></li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-500">E-Commerce Essential</span>
-                            <a href="#contact" class="text-xs font-bold text-brand-navy hover:underline" data-i18n="contactLink">Contact Us →</a>
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信询价</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话咨询</span>
+                            </a>
                         </div>
                     </div>
 
                     <!-- Product 6: PE Poly Bags -->
-                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between">
-                        <div class="p-6">
-                            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mb-4">
-                                <i class="fa-solid fa-bag-shopping"></i>
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between group">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                               <img src="https://images.openai.com/static-rsc-4/66z7j87HzsUL3QQeboSvWXjhiv7jTQT4DSc7o71JItcCS7Qz6KhwoxDHlltO09xMx7Wo-oUDQZaOXLGY8-hn-hzhMepUEywLEaw6xHxwMFS4M09INoZ1XRiK1dBt3afX-IQwps37mPvDj8EQ4lJKFiqGaUwBoc7nYvc-J9aa3_M_FpMLc5_sJ5pDVElu8Nai?purpose=fullsize" alt="Clear PE Poly Bags" > <img src="https://images.unsplash.com/photo-1595246140625-573b715d11dc?auto=format&fit=crop&w=800&q=80" 
+                                     alt="High Clarity LDPE Poly Bags and Ziplock Bags" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/059669/ffffff?text=PE+Poly+Bags';" />
+                                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    High Clarity LDPE
+                                </div>
                             </div>
-                            <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p6Title">PE Poly Bags (PE 胶袋)</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p6Desc">High clarity LDPE / HDPE flat poly bags, ziplock bags, and hole-punched garment bags. Non-toxic, virgin material for industrial parts and everyday packaging.</p>
-                            <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p6Spec1">Tough Sealing & Anti-Bursting</span></li>
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p6Spec2">Air-hole Ventilation Punching</span></li>
-                            </ul>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p6Title">PE Poly Bags (PE 胶袋)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p6Desc">High clarity LDPE / HDPE flat poly bags, ziplock bags, and hole-punched garment bags. Non-toxic, virgin material for industrial parts and everyday packaging.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p6Spec1">Tough Sealing & Anti-Bursting</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p6Spec2">Air-hole Ventilation Punching</span></li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-500">Versatile & Clear</span>
-                            <a href="#contact" class="text-xs font-bold text-brand-navy hover:underline" data-i18n="contactLink">Contact Us →</a>
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信询价</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话咨询</span>
+                            </a>
                         </div>
                     </div>
 
                     <!-- Product 7: PO Poly Bags -->
-                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between">
-                        <div class="p-6">
-                            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl mb-4">
-                                <i class="fa-solid fa-shirt"></i>
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between group">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                               <img src="https://images.openai.com/static-rsc-4/HSeHqgD2VKQ7fAFd1z7ntW8fF4ULQk5GAHsQzEs1LFvYH1emp2nhItAn5-4pCGn-Rqfmi7bkFGIiLJ3BraoHFyLwhQ9fZocn-Wi5S9QjqBzgI1lXhcsKEF1JNuh23fQzAz7-UUgxZH_B2d_s2_LThI_z6ICqA7qefhmaWJe7grMna2sAKniqfqe3--bapAqS?purpose=fullsize" > <img src="https://images.unsplash.com/photo-1572981779307-38b8cabb2407?auto=format&fit=crop&w=800&q=80" 
+                                     alt="High Strength PO HDPE Garment and Retail Poly Bags" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/9333ea/ffffff?text=PO+Poly+Bags';" />
+                                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    High Tensile PO / HDPE
+                                </div>
                             </div>
-                            <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p7Title">PO Poly Bags (PO 胶袋)</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p7Desc">High tensile strength PO (HDPE blend) bags with a crisp, matte feel. Economical choice for apparel, retail t-shirt bags, and industrial inner liners.</p>
-                            <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p7Spec1">High Stiffness & Load Capacity</span></li>
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p7Spec2">Cost-Effective Bulk Packaging</span></li>
-                            </ul>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p7Title">PO Poly Bags (PO 胶袋)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p7Desc">High tensile strength PO (HDPE blend) bags with a crisp, matte feel. Economical choice for apparel, retail t-shirt bags, and industrial inner liners.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p7Spec1">High Stiffness & Load Capacity</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p7Spec2">Cost-Effective Bulk Packaging</span></li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-500">High Strength</span>
-                            <a href="#contact" class="text-xs font-bold text-brand-navy hover:underline" data-i18n="contactLink">Contact Us →</a>
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信询价</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话咨询</span>
+                            </a>
                         </div>
                     </div>
 
                     <!-- Product 8: CPE Frosted Zipper Bags -->
-                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between">
-                        <div class="p-6">
-                            <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl mb-4">
-                                <i class="fa-solid fa-vest flex"></i>
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between group">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                               <img src="https://images.openai.com/static-rsc-4/v1qyvWj0ZzZYgHnQj9W4PxwtDFBaVaaXA2I6aAqNtLkxPINcADGaF7eqWfO8oeyZj1l0yD0WdkWrUhtIdG44pVZro2UEFH_z62MtxhdUAsR4ZGf1qXeYxi5bqfCLD1GZ-ryuJox8Diik2Mhwg-FucsEjWxAbJvcu16O9XDgf4NsyVdneEFASkgYvdUuTjo5d?purpose=fullsize" alt="Frosted Zipper Apparel Bags" > <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=800&q=80" 
+                                     alt="Premium CPE Frosted Translucent Apparel Zipper Bags" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/e11d48/ffffff?text=CPE+Frosted+Bags';" />
+                                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    Silky Frosted CPE
+                                </div>
                             </div>
-                            <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p8Title">CPE Frosted Zipper Bags (CPE 磨砂拉链袋)</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p8Desc">Premium silky-soft frosted finish zipper pouches. Highly popular for global fashion brands, swimwear, footwear, and luxury apparel packaging.</p>
-                            <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p8Spec1">Elegant Soft Touch & Anti-Scratch</span></li>
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p8Spec2">Custom Brand Logo & Vent Hole</span></li>
-                            </ul>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p8Title">CPE Frosted Zipper Bags (CPE 磨砂拉链袋)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p8Desc">Premium silky-soft frosted finish zipper pouches. Highly popular for global fashion brands, swimwear, footwear, and luxury apparel packaging.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p8Spec1">Elegant Soft Touch & Anti-Scratch</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p8Spec2">Custom Brand Logo & Vent Hole</span></li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-500">Apparel Best-Seller</span>
-                            <a href="#contact" class="text-xs font-bold text-brand-navy hover:underline" data-i18n="contactLink">Contact Us →</a>
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信询价</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话咨询</span>
+                            </a>
                         </div>
                     </div>
 
                     <!-- Product 9: Custom Printed Poly Bags -->
-                    <div class="bg-white rounded-2xl border-2 border-brand-teal/40 overflow-hidden shadow-md card-hover flex flex-col justify-between relative">
-                        <div class="absolute top-3 right-3 bg-brand-teal text-white text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded">
-                            Featured OEM
-                        </div>
-                        <div class="p-6">
-                            <div class="w-12 h-12 rounded-xl bg-emerald-100 text-brand-teal flex items-center justify-center text-2xl mb-4">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <div class="bg-white rounded-2xl border-2 border-brand-teal/40 overflow-hidden shadow-md card-hover flex flex-col justify-between group relative">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                               <img src="https://images.openai.com/static-rsc-4/WyRGv4abk30JnTgn9e-OBIZMga8fmdZKV3xo_taoqnp144tLBFBuKUlRi18Yd4eA9-Tqns8oyUS_-ie3rJusiYHaBgZ1Od3l5gHMbZ_NAif11XsjJOTYyPaKadj1Ua23LBty4J4LtsaZlp_pVfWzQ7ZAG-6zmi4fVFH_N0JDN2821B9KMDRlL5e6HCDupR75?purpose=fullsize" alt="Custom Logo Printed Poly Bags" class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"> <img src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80" 
+                                     alt="Custom Printed Branding Poly Plastic Packaging Bags" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/2a9d8f/ffffff?text=Custom+Printed+Bags';" />
+                                <div class="absolute top-3 left-3 bg-brand-teal text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    Featured OEM / ODM
+                                </div>
                             </div>
-                            <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p9Title">Custom Printed Poly Bags (定制各种胶袋)</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p9Desc">Fully customized sizes, colors, thickness, handle cutouts, and multi-color logo printing. Biodegradable (PLA/PBAT) options available upon request.</p>
-                            <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p9Spec1">Low MOQ Starts from 3,000 Pcs</span></li>
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p9Spec2">Free Artwork Proof & Design Guidance</span></li>
-                            </ul>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p9Title">Custom Printed Poly Bags (定制各种胶袋)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p9Desc">Fully customized sizes, colors, thickness, handle cutouts, and multi-color logo printing. Biodegradable (PLA/PBAT) options available upon request.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p9Spec1">Low MOQ Starts from 3,000 Pcs</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p9Spec2">Free Artwork Proof & Design Guidance</span></li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="p-4 bg-emerald-50/50 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-xs font-bold text-brand-teal">OEM / ODM Available</span>
-                            <a href="#contact" class="text-xs font-bold text-brand-navy hover:underline" data-i18n="contactLink">Contact Us →</a>
+                        <div class="p-4 bg-emerald-50/80 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-brand-wechat hover:bg-brand-wechatHover text-white text-xs font-bold rounded-lg transition-colors shadow">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信定制咨询</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-900 hover:bg-brand-navy text-white text-xs font-bold rounded-lg transition-colors shadow">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话定制咨询</span>
+                            </a>
                         </div>
                     </div>
 
@@ -580,71 +712,137 @@
             </div>
         </section>
 
-        <!-- Contact Section -->
-        <section id="contact" class="py-16 lg:py-24 bg-slate-50">
+        <!-- Contact Section High Converting Dual Card Focus -->
+        <section id="contact" class="py-16 lg:py-24 bg-slate-100">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 
-                <div class="text-center max-w-3xl mx-auto mb-16">
+                <div class="text-center max-w-3xl mx-auto mb-12">
                     <h2 class="text-xs font-extrabold uppercase tracking-widest text-brand-teal mb-2" data-i18n="contactSubTitle">Get In Touch</h2>
-                    <p class="text-3xl font-extrabold text-brand-navy sm:text-4xl" data-i18n="contactMainTitle">Contact Us Directly</p>
-                    <p class="text-slate-600 mt-2 text-sm sm:text-base" data-i18n="contactDesc">Discuss global or domestic business. Feel free to call us or add us on WeChat!</p>
+                    <p class="text-3xl font-extrabold text-brand-navy sm:text-4xl" data-i18n="contactMainTitle">微信与电话优先对接通道</p>
+                    <p class="text-slate-600 mt-2 text-sm sm:text-base" data-i18n="contactDesc">承接国内外订单与大宗采购，建议优先使用微信或者直接拨打电话沟通交流！</p>
                 </div>
 
-                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- High Conversion Dual Cards (WeChat vs Phone) -->
+                <div class="grid lg:grid-cols-2 gap-8 mb-12">
                     
-                    <!-- WeChat Card -->
-                    <div onclick="copyWeChat('13802694295')" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all text-center space-y-3 cursor-pointer group">
-                        <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                            <i class="fa-brands fa-weixin"></i>
+                    <!-- WeChat Dedicated Action Card -->
+                    <div class="bg-white p-8 rounded-3xl border-2 border-emerald-500/40 shadow-lg relative flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-extrabold">
+                                    <i class="fa-brands fa-weixin"></i> <span data-i18n="recContactTag">推荐联系方式</span>
+                                </div>
+                                <span class="text-xs font-bold text-slate-400" data-i18n="instantResponse">即时在线回复</span>
+                            </div>
+                            
+                            <h3 class="text-2xl font-extrabold text-slate-900" data-i18n="wechatCardTitle">微信沟通咨询 (WeChat Consultation)</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed" data-i18n="wechatCardDesc">
+                                添加工厂官方微信，快速发送样品图、规格式样、设计排版稿及批量采购报价。
+                            </p>
+
+                            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between">
+                                <div>
+                                    <div class="text-xs font-bold text-slate-500 uppercase" data-i18n="wechatIdLabel">微信号 / WeChat ID</div>
+                                    <div class="text-2xl font-black text-emerald-600 tracking-wide">13802694295</div>
+                                </div>
+                                <button onclick="copyWeChat('13802694295')" class="bg-brand-wechat hover:bg-brand-wechatHover text-white px-5 py-3 rounded-xl font-bold text-xs shadow transition-all flex items-center gap-2">
+                                    <i class="fa-regular fa-copy"></i>
+                                    <span data-i18n="copyWeChatBtn">一键复制微信号</span>
+                                </button>
+                            </div>
                         </div>
-                        <h3 class="font-bold text-slate-800 text-lg flex items-center justify-center gap-1.5">
-                            WeChat <i class="fa-regular fa-copy text-xs text-emerald-600"></i>
-                        </h3>
-                        <p class="text-xs text-slate-500" data-i18n="wechatNote">Add us directly for fast Chinese / English communication</p>
-                        <div class="text-base font-bold text-emerald-600 pt-2 inline-block px-3 py-1 bg-emerald-50 rounded-lg border border-emerald-200/60">
-                            13802694295
+
+                        <div class="pt-6 border-t border-slate-100 mt-6 text-xs text-slate-500 flex items-center justify-between">
+                            <span><i class="fa-solid fa-check text-emerald-500 mr-1"></i> 支持中英越多语沟通</span>
+                            <span><i class="fa-solid fa-check text-emerald-500 mr-1"></i> 免费发图排版</span>
                         </div>
                     </div>
 
-                    <!-- Phone Card -->
-                    <div onclick="copyAndCall('+8613802694295')" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all text-center space-y-3 cursor-pointer group">
-                        <div class="w-12 h-12 rounded-xl bg-blue-100 text-brand-navy mx-auto flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-phone"></i>
+                    <!-- Direct Telephone Card -->
+                    <div class="bg-white p-8 rounded-3xl border-2 border-blue-500/40 shadow-lg relative flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-brand-navy rounded-full text-xs font-extrabold">
+                                    <i class="fa-solid fa-phone"></i> <span data-i18n="directPhoneTag">24H 电话直连</span>
+                                </div>
+                                <span class="text-xs font-bold text-slate-400" data-i18n="directCallTitle">工厂经理直通车</span>
+                            </div>
+
+                            <h3 class="text-2xl font-extrabold text-slate-900" data-i18n="phoneCardTitle">电话直接联系 (Direct Phone Call)</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed" data-i18n="phoneCardDesc">
+                                紧急订单、大宗批发或特殊工艺咨询，欢迎直接拨打工厂热线电话，与小榄供应链负责人直接洽谈。
+                            </p>
+
+                            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between">
+                                <div>
+                                    <div class="text-xs font-bold text-slate-500 uppercase" data-i18n="phoneCallLabel">电话号码 / Tel Line</div>
+                                    <div class="text-2xl font-black text-brand-navy tracking-wide">+86 138 0269 4295</div>
+                                </div>
+                                <a href="tel:+8613802694295" class="bg-brand-navy hover:bg-brand-navyDark text-white px-5 py-3 rounded-xl font-bold text-xs shadow transition-all flex items-center gap-2">
+                                    <i class="fa-solid fa-phone-flip"></i>
+                                    <span data-i18n="callNowBtn">直接拨打电话</span>
+                                </a>
+                            </div>
                         </div>
-                        <h3 class="font-bold text-slate-800 text-lg flex items-center justify-center gap-1.5">
-                            Phone Number <i class="fa-solid fa-phone-flip text-xs text-brand-navy"></i>
-                        </h3>
-                        <p class="text-xs text-slate-500" data-i18n="phoneNote">Direct factory phone line</p>
-                        <div class="text-base font-bold text-brand-navy pt-2 inline-block px-3 py-1 bg-blue-50 rounded-lg border border-blue-200/60">
-                            +86 138 0269 4295
+
+                        <div class="pt-6 border-t border-slate-100 mt-6 text-xs text-slate-500 flex items-center justify-between">
+                            <span><i class="fa-solid fa-check text-emerald-500 mr-1"></i> 7x24 小时电话响应</span>
+                            <span><i class="fa-solid fa-check text-emerald-500 mr-1"></i> 立即沟通定制细节</span>
                         </div>
                     </div>
 
-                    <!-- Location Card -->
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center space-y-3">
-                        <div class="w-12 h-12 rounded-xl bg-teal-100 text-brand-teal mx-auto flex items-center justify-center text-2xl">
+                </div>
+
+                <!-- Secondary Info Cards -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-teal-100 text-brand-teal flex items-center justify-center text-2xl shrink-0">
                             <i class="fa-solid fa-location-dot"></i>
                         </div>
-                        <h3 class="font-bold text-slate-800 text-lg" data-i18n="addrTitle">Address</h3>
-                        <p class="text-xs text-slate-500" data-i18n="addrSub">Guangdong Province, China</p>
-                        <div class="text-sm font-bold text-brand-navy pt-2" data-i18n="addrText">Xiaolan Town, Zhongshan City</div>
+                        <div>
+                            <div class="text-xs font-bold text-slate-400 uppercase" data-i18n="addrTitle">Address</div>
+                            <div class="text-base font-bold text-slate-800" data-i18n="addrText">Xiaolan Town, Zhongshan City, Guangdong, China</div>
+                        </div>
                     </div>
 
-                    <!-- Working Hours Card -->
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center space-y-3">
-                        <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 mx-auto flex items-center justify-center text-2xl">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl shrink-0">
                             <i class="fa-solid fa-clock"></i>
                         </div>
-                        <h3 class="font-bold text-slate-800 text-lg" data-i18n="hoursTitle">Working Hours</h3>
-                        <p class="text-xs text-slate-500" data-i18n="hoursSub">Monday - Sunday</p>
-                        <div class="text-sm font-bold text-brand-navy pt-2">7:30 AM - 6:00 PM (GMT+8)</div>
+                        <div>
+                            <div class="text-xs font-bold text-slate-400 uppercase" data-i18n="hoursTitle">Working Hours</div>
+                            <div class="text-base font-bold text-slate-800">Monday - Sunday: 7:30 AM - 6:00 PM (GMT+8)</div>
+                        </div>
                     </div>
-
                 </div>
+
             </div>
         </section>
 
     </main>
+
+    <!-- Floating Action Quick Buttons (FAB) for WeChat & Tel -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+        <!-- WeChat Floating FAB with Popover Hint -->
+        <div class="relative group">
+            <div class="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex bg-slate-900 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-xl whitespace-nowrap items-center gap-1.5">
+                <i class="fa-brands fa-weixin text-emerald-400"></i> WeChat ID: 13802694295 (Click to Copy)
+            </div>
+            <button onclick="copyWeChat('13802694295')" class="w-14 h-14 bg-brand-wechat hover:bg-brand-wechatHover text-white rounded-full shadow-2xl flex items-center justify-center text-2xl transition-all transform hover:scale-110 border-2 border-white">
+                <i class="fa-brands fa-weixin"></i>
+            </button>
+        </div>
+
+        <!-- Phone Floating FAB -->
+        <div class="relative group">
+            <div class="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex bg-slate-900 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-xl whitespace-nowrap items-center gap-1.5">
+                <i class="fa-solid fa-phone text-cyan-400"></i> Direct Call: +86 138 0269 4295
+            </div>
+            <a href="tel:+8613802694295" class="w-14 h-14 bg-brand-navy hover:bg-brand-navyDark text-white rounded-full shadow-2xl flex items-center justify-center text-xl transition-all transform hover:scale-110 border-2 border-white">
+                <i class="fa-solid fa-phone"></i>
+            </a>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="bg-slate-900 text-slate-400 text-xs py-12 border-t border-slate-800">
@@ -654,13 +852,13 @@
                     <div class="text-white font-bold text-lg mb-1">ShunXiang Packaging (顺祥胶袋包装)</div>
                     <p class="text-slate-400 max-w-md" data-i18n="footDesc">Your trusted B2B partner for custom plastic bags, stretch films, and industrial protective packaging in China.</p>
                 </div>
-                <div class="flex gap-4">
-                    <button onclick="copyWeChat('13802694295')" class="w-10 h-10 rounded-full bg-white/10 hover:bg-emerald-600 text-white flex items-center justify-center text-lg transition-colors cursor-pointer" title="Copy WeChat ID">
-                        <i class="fa-brands fa-weixin"></i>
+                <div class="flex items-center gap-3">
+                    <button onclick="copyWeChat('13802694295')" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-brand-wechat text-white flex items-center gap-2 transition-colors font-bold text-xs">
+                        <i class="fa-brands fa-weixin text-base"></i> WeChat ID: 13802694295
                     </button>
-                    <button onclick="copyAndCall('+8613802694295')" class="w-10 h-10 rounded-full bg-white/10 hover:bg-brand-navy text-white flex items-center justify-center text-lg transition-colors cursor-pointer" title="Call Phone">
-                        <i class="fa-solid fa-phone"></i>
-                    </button>
+                    <a href="tel:+8613802694295" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-brand-navy text-white flex items-center gap-2 transition-colors font-bold text-xs">
+                        <i class="fa-solid fa-phone text-base"></i> Tel: +86 138 0269 4295
+                    </a>
                 </div>
             </div>
             <div class="border-t border-slate-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-500">
@@ -673,122 +871,22 @@
         </div>
     </footer>
 
-    <!-- JavaScript i18n Data & Interactivity -->
+    <!-- JavaScript Translations & Interaction Functions -->
     <script>
         // Multi-language Translation Dictionary
         const translations = {
-            en: {
-                topBarDuty: "Form E & RCEP 0-5% Duty-Free Certificate Supported",
-                topBarDDP: "DDP Shipping to SE Asia & Worldwide",
-                logoSub: "Packaging / 顺祥胶袋包装",
-                navHome: "Home",
-                navProducts: "Products",
-                navAdvantages: "Why Us",
-                navAbout: "About Us",
-                navContact: "Contact",
-                heroTag: "Direct Factory Supply • Xiaolan, China",
-                heroTitle: "One-Stop Flexible & Industrial Packaging Solutions",
-                heroDesc: "Empowering global e-commerce, garment, and industrial clients with premium stretch film, custom poly bags, CPE zipper pouches, and eco-friendly mailers.",
-                heroBadge1: "Low MOQ Custom Logo",
-                heroBadge2: "High Tensile & Tear Resistant",
-                heroBadge3: "0% Tariff Clearances",
-                heroBadge4: "Southeast Asia & Global",
-                heroBtnWhatsApp: "WeChat ID 13802694295",
-                heroBtnSample: "Explore Products",
-                directContactTitle: "Direct Support & Contact",
-                directContactDesc: "Connect directly with our Xiaolan supply team for high-quality packaging products and customized solutions.",
-                viewContactBtn: "View All Contact Information",
-                stat1: "Virgin Material Quality",
-                stat2: "Low Custom MOQ",
-                stat3: "ASEAN Form E Tariff",
-                stat4: "Fast Lead Time",
-                prodSubTitle: "Full Spectrum Packaging Supplies",
-                prodMainTitle: "Our Industrial & Custom Packaging Products",
-                prodDesc: "High durability, clear transparency, heavy loading capacity, and fully customizable for your brand requirements.",
-                p1Title: "Stretch Film (拉伸膜)",
-                p1Desc: "Hand & machine grade LLDPE stretch film. High puncture resistance, superior stretchability, and strong self-adhesion for pallet wrapping and cargo protection.",
-                p1Spec1: "Thickness: 15 - 50 Micron",
-                p1Spec2: "Color: Clear, Black, Blue",
-                p2Title: "Strapping Band (打包带)",
-                p2Desc: "Heavy-duty PET & PP strapping belts for bundling cartons, timber, and heavy machinery. Compatible with automatic and manual strapping tools.",
-                p2Spec1: "Material: High Tensile PP / PET",
-                p2Spec2: "Custom Widths & Colors",
-                p3Title: "EPE Pearl Cotton Foam (珍珠棉)",
-                p3Desc: "Shockproof, anti-scratch EPE foam sheets, rolls, and bags. Essential protection for hardware, electronics, lighting fixtures, and fragile goods.",
-                p3Spec1: "Custom Thickness & Foam Die-cuts",
-                p3Spec2: "Waterproof & Anti-Static Options",
-                p4Title: "Sealing Tape / BOPP Tape (封箱胶)",
-                p4Desc: "Strong acrylic adhesive BOPP carton sealing tape. Available in clear, tan, fragile warning print, and customized brand logo printing.",
-                p4Spec1: "Strong Adhesion & Weatherproof",
-                p4Spec2: "Custom Brand Logo Printing",
-                p5Title: "Bubble Mailers & Bags (气泡袋)",
-                p5Desc: "Protective bubble wrap pouches and metallic/poly bubble mailers with self-adhesive destructive glue. Ideal for e-commerce, cosmetics, and electronics shipping.",
-                p5Spec1: "Tamper-Evident Strong Adhesive",
-                p5Spec2: "Shockproof Air Bubble Cushioning",
-                p6Title: "PE Poly Bags (PE 胶袋)",
-                p6Desc: "High clarity LDPE / HDPE flat poly bags, ziplock bags, and hole-punched garment bags. Non-toxic, virgin material for industrial parts and everyday packaging.",
-                p6Spec1: "Tough Sealing & Anti-Bursting",
-                p6Spec2: "Air-hole Ventilation Punching",
-                p7Title: "PO Poly Bags (PO 胶袋)",
-                p7Desc: "High tensile strength PO (HDPE blend) bags with a crisp, matte feel. Economical choice for apparel, retail t-shirt bags, and industrial inner liners.",
-                p7Spec1: "High Stiffness & Load Capacity",
-                p7Spec2: "Cost-Effective Bulk Packaging",
-                p8Title: "CPE Frosted Zipper Bags (CPE 磨砂拉链袋)",
-                p8Desc: "Premium silky-soft frosted finish zipper pouches. Highly popular for global fashion brands, swimwear, footwear, and luxury apparel packaging.",
-                p8Spec1: "Elegant Soft Touch & Anti-Scratch",
-                p8Spec2: "Custom Brand Logo & Vent Hole",
-                p9Title: "Custom Printed Poly Bags (定制各种胶袋)",
-                p9Desc: "Fully customized sizes, colors, thickness, handle cutouts, and multi-color logo printing. Biodegradable (PLA/PBAT) options available upon request.",
-                p9Spec1: "Low MOQ Starts from 3,000 Pcs",
-                p9Spec2: "Free Artwork Proof & Design Guidance",
-                contactLink: "Contact Us →",
-                advSubTitle: "Why Global Traders Choose ShunXiang",
-                advMainTitle: "Tailored For Export & Low-Barrier Import",
-                adv1Title: "Low MOQ Customization",
-                adv1Desc: "Custom logo printing starts from only 3,000 pieces. Perfect for growing e-commerce brands and boutique importers.",
-                adv2Title: "Form E & RCEP Duty-Free",
-                adv2Desc: "We provide official ASEAN Form E and RCEP certificates of origin, helping you enjoy 0% - 5% tariff reduction.",
-                adv3Title: "DDP Door-to-Door Logistics",
-                adv3Desc: "Stress-free DDP shipping to Vietnam, Thailand, Indonesia, Malaysia, and Middle East with full customs clearance.",
-                adv4Title: "Xiaolan Supply Chain",
-                adv4Desc: "Direct access to Zhongshan Xiaolan's robust raw material and blown-film manufacturing network for competitive pricing.",
-                aboutTag: "About ShunXiang Packaging",
-                aboutTitle: "Your Reliable Flexible Packaging Partner in Xiaolan",
-                aboutP1: "ShunXiang Packaging (顺祥胶袋包装) operates with an agile 'Trading & Direct Supply Chain' model. Rooted in Xiaolan Town, Zhongshan City, Guangdong Province—a world-class manufacturing hub—we specialize in exporting industrial packaging and custom poly bags.",
-                aboutP2: "Unlike traditional rigid factories, we prioritize flexibility: low MOQs, rapid sample delivery, multi-lingual client support via WeChat, and end-to-end international shipping assistance.",
-                aboutStat1Title: "Global Focus",
-                aboutStat1Desc: "SE Asia, Middle East, Europe & Americas",
-                aboutStat2Title: "Quick Turnaround",
-                aboutStat2Desc: "3-5 Days Sample, 7-10 Days Bulk",
-                aboutStat3Title: "Agile Partner",
-                aboutStat3Desc: "Small Orders & OEM Customized",
-                aboutStat4Title: "Duty Free Docs",
-                aboutStat4Desc: "Form E, RCEP, Commercial Invoice",
-                contactSubTitle: "Get In Touch",
-                contactMainTitle: "Contact Us Directly",
-                contactDesc: "Discuss global or domestic business. Feel free to call us or add us on WeChat!",
-                wechatNote: "Add us directly for Chinese / English communication",
-                phoneNote: "Direct factory phone line",
-                addrTitle: "Address",
-                addrSub: "Guangdong Province, China",
-                addrText: "Xiaolan Town, Zhongshan City",
-                hoursTitle: "Working Hours",
-                hoursSub: "Monday - Sunday",
-                footDesc: "Your trusted B2B partner for custom plastic bags, stretch films, and industrial protective packaging in China.",
-                clickCopy: "Copy",
-                clickCall: "Call",
-                wechatCopied: "WeChat ID (13802694295) copied to clipboard!",
-                phoneCopied: "Phone number copied to clipboard! Dialing now..."
-            },
             zh: {
                 topBarDuty: "支持 Form E / RCEP 关税优惠证书（享 0-5% 进口关税）",
                 topBarDDP: "支持东南亚及全球 DDP 双清含税送到门服务",
                 logoSub: "顺祥胶袋包装 / ShunXiang",
+                headWeChatBtn: "添加微信咨询",
                 navHome: "首页",
                 navProducts: "产品中心",
                 navAdvantages: "核心优势",
                 navAbout: "关于顺祥",
                 navContact: "联系我们",
+                wechatCallBtn: "微信咨询",
+                phoneCallBtn: "电话直连",
                 heroTag: "源头工厂直供 • 中山小榄扎实供应链",
                 heroTitle: "一站式软包装与工业包装出海解决方案",
                 heroDesc: "为全球跨境电商、服装品牌及工业客户提供高品质拉伸膜、CPE磨砂拉链袋、PE/PO平口袋及气泡缓冲袋。",
@@ -796,11 +894,15 @@
                 heroBadge2: "100% 全新料加厚抗爆",
                 heroBadge3: "Form E 关税减免",
                 heroBadge4: "东南亚/中东 DDP 到门",
-                heroBtnWhatsApp: "电话/微信咨询：13802694295",
-                heroBtnSample: "浏览产品系列",
-                directContactTitle: "官方联系与直连方式",
-                directContactDesc: "直接联系我们位于中山小榄的供应链团队，了解高质量软包装产品与定制方案。",
-                viewContactBtn: "查看全部联系方式",
+                heroBtnWeChat: "微信咨询: 13802694295",
+                heroBtnPhone: "电话直连: +86 138 0269 4295",
+                directContactTitle: "官方微信与电话快速通道",
+                directContactDesc: "欢迎随时通过微信或电话与我们位于中山小榄的生产团队沟通，获取即时报价与样品寄送服务。",
+                wechatLabel: "微信咨询号 (点击复制)",
+                copyBtnText: "点击复制",
+                phoneLabel: "24小时电话热线 (点击拨打)",
+                callBtnText: "拨打电话",
+                viewContactBtn: "查看详细工厂地址与联系说明",
                 stat1: "全新料高品质",
                 stat2: "小批量可起订",
                 stat3: "Form E 零关税",
@@ -844,7 +946,8 @@
                 p9Desc: "全方位定制袋型、尺寸、厚度、手提孔及多色印刷。可根据要求提供可降解（PLA/PBAT）环保胶袋。",
                 p9Spec1: "低起订量 3,000 个起",
                 p9Spec2: "免费设计排版与样品确认",
-                contactLink: "联系我们 →",
+                prodInquireWeChat: "微信询价",
+                prodInquirePhone: "电话咨询",
                 advSubTitle: "为什么海外买家选择顺祥胶袋",
                 advMainTitle: "专为出口与轻资产采购打造",
                 adv1Title: "小批量定制低门槛",
@@ -868,30 +971,152 @@
                 aboutStat4Title: "关税优惠单证",
                 aboutStat4Desc: "支持 Form E, RCEP 产地证",
                 contactSubTitle: "联系我们",
-                contactMainTitle: "直接与我们取得联系",
-                contactDesc: "承接国内外业务，欢迎致电或者添加微信号！",
-                wechatNote: "加微信直接沟通，支持中英文",
-                phoneNote: "工厂电话直连",
+                contactMainTitle: "微信与电话优先对接通道",
+                contactDesc: "承接国内外订单与大宗采购，建议优先使用微信或者直接拨打电话沟通交流！",
+                recContactTag: "推荐联系方式",
+                instantResponse: "即时在线回复",
+                wechatCardTitle: "微信沟通咨询 (WeChat)",
+                wechatCardDesc: "添加工厂官方微信，快速发送样品图、规格式样、设计排版稿及批量采购报价。",
+                wechatIdLabel: "微信号 / WeChat ID",
+                copyWeChatBtn: "一键复制微信号",
+                directPhoneTag: "24H 电话直连",
+                directCallTitle: "工厂经理直通车",
+                phoneCardTitle: "电话直接联系 (Call)",
+                phoneCardDesc: "紧急订单、大宗批发或特殊工艺咨询，欢迎直接拨打工厂热线电话，与小榄供应链负责人洽谈。",
+                phoneCallLabel: "电话号码 / Tel Line",
+                callNowBtn: "直接拨打电话",
                 addrTitle: "工厂 / 办公地址",
-                addrSub: "中国广东省",
-                addrText: "中山市小榄镇",
+                addrText: "中国广东省中山市小榄镇",
                 hoursTitle: "营业时间",
-                hoursSub: "周一至周日",
-                footDesc: "中国优质塑料胶袋、拉伸膜及工业防护包装一站式 B2B 供应商。",
-                clickCopy: "复制微信号",
-                clickCall: "拨打",
-                wechatCopied: "微信号（13802694295）已复制到剪贴板！",
-                phoneCopied: "电话号码已复制到剪贴板，正在为你调起拨号界面..."
+                footDesc: "中国优质塑料胶袋、拉伸膜及工业防护包装一站式 B2B 供应商。"
+            },
+            en: {
+                topBarDuty: "Form E & RCEP 0-5% Duty-Free Certificate Supported",
+                topBarDDP: "DDP Shipping to SE Asia & Worldwide",
+                logoSub: "Packaging / 顺祥胶袋包装",
+                headWeChatBtn: "Add WeChat",
+                navHome: "Home",
+                navProducts: "Products",
+                navAdvantages: "Why Us",
+                navAbout: "About Us",
+                navContact: "Contact",
+                wechatCallBtn: "WeChat",
+                phoneCallBtn: "Phone Call",
+                heroTag: "Direct Factory Supply • Xiaolan, China",
+                heroTitle: "One-Stop Flexible & Industrial Packaging Solutions",
+                heroDesc: "Empowering global e-commerce, garment, and industrial clients with premium stretch film, custom poly bags, CPE zipper pouches, and eco-friendly mailers.",
+                heroBadge1: "Low MOQ Custom Logo",
+                heroBadge2: "High Tensile & Tear Resistant",
+                heroBadge3: "0% Tariff Clearances",
+                heroBadge4: "Southeast Asia & Global",
+                heroBtnWeChat: "WeChat: 13802694295",
+                heroBtnPhone: "Call Us: +86 138 0269 4295",
+                directContactTitle: "Direct WeChat & Telephone Channels",
+                directContactDesc: "Connect directly with our Xiaolan supply team via WeChat or Phone for instant inquiries, samples, and customized solutions.",
+                wechatLabel: "WeChat ID (Click to Copy)",
+                copyBtnText: "Copy ID",
+                phoneLabel: "24H Phone Hotlines (Click to Call)",
+                callBtnText: "Call Now",
+                viewContactBtn: "View All Contact Details & Location",
+                stat1: "Virgin Material Quality",
+                stat2: "Low Custom MOQ",
+                stat3: "ASEAN Form E Tariff",
+                stat4: "Fast Lead Time",
+                prodSubTitle: "Full Spectrum Packaging Supplies",
+                prodMainTitle: "Industrial & Custom Packaging Products",
+                prodDesc: "High durability, clear transparency, heavy loading capacity, and fully customizable for your brand requirements.",
+                p1Title: "Stretch Film (拉伸膜)",
+                p1Desc: "Hand & machine grade LLDPE stretch film. High puncture resistance, superior stretchability, and strong self-adhesion for pallet wrapping.",
+                p1Spec1: "Thickness: 15 - 50 Micron",
+                p1Spec2: "Color: Clear, Black, Blue",
+                p2Title: "Strapping Band (打包带)",
+                p2Desc: "Heavy-duty PET & PP strapping belts for bundling cartons, timber, and heavy machinery.",
+                p2Spec1: "Material: High Tensile PP / PET",
+                p2Spec2: "Custom Widths & Colors",
+                p3Title: "EPE Pearl Cotton Foam (珍珠棉)",
+                p3Desc: "Shockproof, anti-scratch EPE foam sheets, rolls, and bags. Essential protection for hardware and electronics.",
+                p3Spec1: "Custom Thickness & Foam Die-cuts",
+                p3Spec2: "Waterproof & Anti-Static Options",
+                p4Title: "Sealing Tape / BOPP Tape (封箱胶)",
+                p4Desc: "Strong acrylic adhesive BOPP carton sealing tape. Available in clear, tan, fragile warning print, and logo printing.",
+                p4Spec1: "Strong Adhesion & Weatherproof",
+                p4Spec2: "Custom Brand Logo Printing",
+                p5Title: "Bubble Mailers & Bags (气泡袋)",
+                p5Desc: "Protective bubble wrap pouches and metallic/poly bubble mailers with self-adhesive destructive glue.",
+                p5Spec1: "Tamper-Evident Strong Adhesive",
+                p5Spec2: "Shockproof Air Bubble Cushioning",
+                p6Title: "PE Poly Bags (PE 胶袋)",
+                p6Desc: "High clarity LDPE / HDPE flat poly bags, ziplock bags, and hole-punched garment bags. Non-toxic, virgin material.",
+                p6Spec1: "Tough Sealing & Anti-Bursting",
+                p6Spec2: "Air-hole Ventilation Punching",
+                p7Title: "PO Poly Bags (PO 胶袋)",
+                p7Desc: "High tensile strength PO (HDPE blend) bags with a crisp feel. Economical choice for apparel.",
+                p7Spec1: "High Stiffness & Load Capacity",
+                p7Spec2: "Cost-Effective Bulk Packaging",
+                p8Title: "CPE Frosted Zipper Bags (CPE 磨砂拉链袋)",
+                p8Desc: "Premium silky-soft frosted finish zipper pouches. Highly popular for fashion brands, swimwear, and footwear.",
+                p8Spec1: "Elegant Soft Touch & Anti-Scratch",
+                p8Spec2: "Custom Brand Logo & Vent Hole",
+                p9Title: "Custom Printed Poly Bags (定制各种胶袋)",
+                p9Desc: "Fully customized sizes, colors, thickness, handle cutouts, and multi-color logo printing.",
+                p9Spec1: "Low MOQ Starts from 3,000 Pcs",
+                p9Spec2: "Free Artwork Proof & Design Guidance",
+                prodInquireWeChat: "WeChat Quote",
+                prodInquirePhone: "Phone Call",
+                advSubTitle: "Why Global Traders Choose ShunXiang",
+                advMainTitle: "Tailored For Export & Low-Barrier Import",
+                adv1Title: "Low MOQ Customization",
+                adv1Desc: "Custom logo printing starts from only 3,000 pieces. Perfect for growing e-commerce brands.",
+                adv2Title: "Form E & RCEP Duty-Free",
+                adv2Desc: "We provide official ASEAN Form E and RCEP certificates of origin for tariff reductions.",
+                adv3Title: "DDP Door-to-Door Logistics",
+                adv3Desc: "Stress-free DDP shipping to Vietnam, Thailand, Indonesia, Malaysia, and Middle East with full customs clearance.",
+                adv4Title: "Xiaolan Supply Chain",
+                adv4Desc: "Direct access to Zhongshan Xiaolan's robust raw material and manufacturing network.",
+                aboutTag: "About ShunXiang Packaging",
+                aboutTitle: "Your Reliable Flexible Packaging Partner in Xiaolan",
+                aboutP1: "ShunXiang Packaging operates with an agile supply chain model rooted in Xiaolan Town, Zhongshan, Guangdong.",
+                aboutP2: "We prioritize flexibility: low MOQs, rapid sample delivery, multi-lingual client support via WeChat.",
+                aboutStat1Title: "Global Focus",
+                aboutStat1Desc: "SE Asia, Middle East, Europe & Americas",
+                aboutStat2Title: "Quick Turnaround",
+                aboutStat2Desc: "3-5 Days Sample, 7-10 Days Bulk",
+                aboutStat3Title: "Agile Partner",
+                aboutStat3Desc: "Small Orders & OEM Customized",
+                aboutStat4Title: "Duty Free Docs",
+                aboutStat4Desc: "Form E, RCEP, Commercial Invoice",
+                contactSubTitle: "Get In Touch",
+                contactMainTitle: "WeChat & Phone Contact Channels",
+                contactDesc: "Discuss global or domestic business. Feel free to call us or add us on WeChat!",
+                recContactTag: "Recommended Option",
+                instantResponse: "Instant Online Reply",
+                wechatCardTitle: "WeChat Consultation",
+                wechatCardDesc: "Add our official WeChat to send artwork, specs, sample requests, and receive fast wholesale quotations.",
+                wechatIdLabel: "WeChat ID",
+                copyWeChatBtn: "Copy WeChat ID",
+                directPhoneTag: "24H Phone Line",
+                directCallTitle: "Direct Supply Manager",
+                phoneCardTitle: "Direct Telephone Call",
+                phoneCardDesc: "For urgent inquiries, wholesale orders, or custom specs, call our factory management line directly.",
+                phoneCallLabel: "Telephone Line",
+                callNowBtn: "Call Now",
+                addrTitle: "Address",
+                addrText: "Xiaolan Town, Zhongshan City, Guangdong Province, China",
+                hoursTitle: "Working Hours",
+                footDesc: "Your trusted B2B partner for custom plastic bags, stretch films, and industrial protective packaging in China."
             },
             vi: {
-                topBarDuty: "Hỗ trợ Chứng nhận Form E & RCEP (Miễn/Giảm thuế 0-5%)",
-                topBarDDP: "Giao hàng DDP bao thuế tận nơi đến Việt Nam & Toàn cầu",
-                logoSub: "ShunXiang Packaging / Bao Bì Thuận Tường",
+                topBarDuty: "Hỗ trợ Form E & RCEP (Miễn/Giảm thuế 0-5%)",
+                topBarDDP: "Giao DDP bao thuế tận nơi đến Việt Nam & Toàn cầu",
+                logoSub: "Packaging / Bao Bì Thuận Tường",
+                headWeChatBtn: "Thêm WeChat",
                 navHome: "Trang chủ",
                 navProducts: "Sản phẩm",
                 navAdvantages: "Ưu điểm",
                 navAbout: "Về chúng tôi",
                 navContact: "Liên hệ",
+                wechatCallBtn: "Tư vấn WeChat",
+                phoneCallBtn: "Gọi điện ngay",
                 heroTag: "Cung cấp trực tiếp từ xưởng • Tiểu Lam, Trung Quốc",
                 heroTitle: "Giải Pháp Màng Bọc & Bao Bì Nhựa Công Nghiệp Trọn Gói",
                 heroDesc: "Chuyên cung cấp màng co, túi zipper CPE mờ, túi PE/PO và túi khí bảo vệ cho thương mại điện tử và may mặc toàn cầu.",
@@ -899,11 +1124,15 @@
                 heroBadge2: "100% Chất Liệu Nguyên Sinh",
                 heroBadge3: "Hỗ Trợ Miễn Thuế Form E",
                 heroBadge4: "Giao DDP Tận Nơi Đông Nam Á",
-                heroBtnWhatsApp: "WeChat: 13802694295",
-                heroBtnSample: "Khám Phá Sản Phẩm",
-                directContactTitle: "Thông Tin Liên Hệ Trực Tiếp",
-                directContactDesc: "Liên hệ trực tiếp với đội ngũ tại Tiểu Lam để nhận hỗ trợ về sản phẩm và giải pháp bao bì.",
-                viewContactBtn: "Xem Tất Cả Thông Tin Liên Hệ",
+                heroBtnWeChat: "Tư vấn WeChat: 13802694295",
+                heroBtnPhone: "Gọi điện ngay: +86 138 0269 4295",
+                directContactTitle: "Kênh Kết Nối WeChat & Điện Thoại Trực Tiếp",
+                directContactDesc: "Liên hệ trực tiếp với xưởng sản xuất tại Tiểu Lam qua WeChat hoặc điện thoại để nhận báo giá và mẫu ngay lập tức.",
+                wechatLabel: "Số WeChat (Nhấp để sao chép)",
+                copyBtnText: "Sao chép ID",
+                phoneLabel: "Hotline 24/7 (Nhấp để gọi)",
+                callBtnText: "Gọi điện ngay",
+                viewContactBtn: "Xem địa chỉ xưởng & thông tin chi tiết",
                 stat1: "100% Nguyên Sinh",
                 stat2: "MOQ Nhỏ Nhận In",
                 stat3: "Thuế Form E 0-5%",
@@ -911,102 +1140,53 @@
                 prodSubTitle: "Danh Mục Bao Bì Đầy Đủ",
                 prodMainTitle: "Sản Phẩm Bao Bì Nhựa & Công Nghiệp",
                 prodDesc: "Độ bền cao, độ trong suốt rõ nét, chịu lực tốt và tùy chỉnh theo yêu cầu thương hiệu.",
-                p1Title: "Màng Quấn Pallet / Màng Co (拉伸膜)",
-                p1Desc: "Màng quấn LLDPE quấn tay và quấn máy. Chống đâm thủng cao, độ co giãn vượt trội bảo vệ hàng hóa.",
-                p1Spec1: "Độ dày: 15 - 50 Micron",
-                p1Spec2: "Màu sắc: Trong suốt, Đen, Xanh",
-                p2Title: "Dây Đai Đóng Hàng (打包带)",
-                p2Desc: "Dây đai PET & PP chịu lực cao dùng cho đóng thùng carton, gỗ và máy móc nặng.",
-                p2Spec1: "Chất liệu: PP / PET Chịu Lực High-Tensile",
-                p2Spec2: "Tùy chỉnh chiều rộng & màu sắc",
-                p3Title: "Mút Xốp EPE / Màng Ngọc (珍珠棉)",
-                p3Desc: "Tấm và túi mút xốp EPE chống sốc, chống trầy xước. Bảo vệ linh kiện linh kiện điện tử, đồ ngũ kim.",
-                p3Spec1: "Tùy chỉnh độ dày & cắt định hình",
-                p3Spec2: "Có tùy chọn Chống Tĩnh Điện",
-                p4Title: "Băng Keo Đóng Thùng (封箱胶)",
-                p4Desc: "Băng dính BOPP độ dính cao. Có sẵn màu trong, đục, in cảnh báo và in logo thương hiệu.",
-                p4Spec1: "Độ dính cực cao & chịu nhiệt",
-                p4Spec2: "In Logo Thương Hiệu Riêng",
-                p5Title: "Túi Khí / Phong Bì Bóng Khí (气泡袋)",
-                p5Desc: "Túi bóng khí chống sốc kèm keo niêm phong niêm phong chống bóc. Tối ưu cho gửi hàng thương mại điện tử.",
-                p5Spec1: "Keo Niêm Phong Chống Bóc",
-                p5Spec2: "Bóng Khí Chống Sốc Dày Dặn",
-                p6Title: "Túi Nhựa PE (PE 胶袋)",
-                p6Desc: "Túi PE đục lỗ, túi miết miệt ziplock trong suốt. Hàng nhựa nguyên sinh an toàn cho quần áo và linh kiện.",
-                p6Spec1: "Đường Hàn Chắc Chắn Chống Bục",
-                p6Spec2: "Đục Lỗ Thông Khí Tùy Chọn",
-                p7Title: "Túi Nhựa PO (PO 胶袋)",
-                p7Desc: "Túi PO dẻo dai, nhám nhẹ. Giải pháp tiết kiệm cho bao bì quần áo, túi xách đục lỗ hột gà.",
-                p7Spec1: "Chịu Lực Tốt & Giá Thành Rẻ",
-                p7Spec2: "Thích Hợp Đóng Mua Sỉ Số Lượng Lớn",
-                p8Title: "Túi Zipper Mờ CPE (CPE 磨砂拉链袋)",
-                p8Desc: "Túi khóa zipper mặt mờ sang trọng. Sản phẩm bán chạy nhất cho thương hiệu thời trang, giày dép, đồ lót.",
-                p8Spec1: "Bề Mặt Mờ Mịn Vượt Trội",
-                p8Spec2: "In Logo & Đục Lỗ Theo Yêu Cầu",
-                p9Title: "Túi Nhựa In Theo Yêu Cầu (定制胶袋)",
-                p9Desc: "Sản xuất mọi kích thước, màu sắc, độ dày và in logo nhiều màu. Có sẵn dòng tự hủy sinh học.",
-                p9Spec1: "Số Lượng Tối Thiểu Từ 3,000 Cái",
-                p9Spec2: "Hỗ Trợ Thiết Kế Mẫu Miễn Phí",
-                contactLink: "Liên Hệ Ngay →",
-                advSubTitle: "Vì Sao Khách Hàng Chọn ShunXiang",
-                advMainTitle: "Tối Ưu Cho Nhập Khẩu & Tiết Kiệm Chi Phí",
-                adv1Title: "Số Lượng Đặt Hàng Thấp",
-                adv1Desc: "In logo riêng chỉ từ 3,000 túi, phù hợp cho shop online và thương hiệu thời trang mới.",
-                adv2Title: "Ưu Đãi Thuế Form E & RCEP",
-                adv2Desc: "Cung cấp C/O Form E chính thức giúp giảm thuế nhập khẩu về 0% - 5% tại Việt Nam.",
-                adv3Title: "Giao Hàng DDP Tận Nơi",
-                adv3Desc: "Dịch vụ vận chuyển bao thuế trọn gói về Hồ Chí Minh, Hà Nội và các tỉnh.",
-                adv4Title: "Xưởng Trực Tiếp Tại Tiểu Lam",
-                adv4Desc: "Kết nối trực tiếp nguồn nguyên liệu giá gốc tại Quảng Đông giúp giá cạnh tranh nhất.",
-                aboutTag: "Về ShunXiang Packaging",
-                aboutTitle: "Đối Tác Bao Bì Nhựa Đáng Tin Cậy Của Bạn",
-                aboutP1: "ShunXiang Packaging tọa lạc tại thị trấn Tiểu Lam, thành phố Trung Sơn, Quảng Đông - thủ phủ sản xuất bao bì nhựa lớn nhất Trung Quốc.",
-                aboutP2: "Chúng tôi linh hoạt phục vụ khách hàng quốc tế: MOQ thấp, gửi mẫu nhanh, tư vấn WeChat/Zalo nhiệt tình.",
-                aboutStat1Title: "Thị Trường Toàn Cầu",
-                aboutStat1Desc: "Việt Nam, Đông Nam Á, Trung Đông",
-                aboutStat2Title: "Thời Gian Nhanh",
-                aboutStat2Desc: "Mẫu 3-5 ngày, Hàng lớn 7-10 ngày",
-                aboutStat3Title: "Linh Hoạt",
-                aboutStat3Desc: "Đơn hàng nhỏ & In ấn OEM",
-                aboutStat4Title: "Chứng Nhận Thuế",
-                aboutStat4Desc: "Form E, RCEP Giảm Thuế",
-                contactSubTitle: "Liên Hệ",
-                contactMainTitle: "Liên Hệ Trực Tiếp",
-                contactDesc: "Hợp tác đơn hàng trong nước/quốc tế. Liên hệ gọi điện hoặc kết bạn WeChat ngay!",
-                wechatNote: "Hỗ trợ tiếng Việt / tiếng Anh / tiếng Trung",
-                phoneNote: "Số điện thoại xưởng trực tiếp",
-                addrTitle: "Địa Chỉ Xưởng",
-                addrSub: "Tỉnh Quảng Đông, Trung Quốc",
-                addrText: "Thị trấn Tiểu Lam, TP Trung Sơn",
-                hoursTitle: "Giờ Làm Việc",
-                hoursSub: "Thứ Hai - Chủ Nhật",
-                footDesc: "Nhà cung cấp bao bì nhựa, màng co và vật liệu đóng gói uy tín tại Trung Quốc.",
-                clickCopy: "Sao chép",
-                clickCall: "Gọi điện",
-                wechatCopied: "Đã sao chép WeChat ID (13802694295)!",
-                phoneCopied: "Đã sao chép số điện thoại! Đang mở cuộc gọi..."
+                prodInquireWeChat: "Báo giá WeChat",
+                prodInquirePhone: "Gọi điện tư vấn",
+                recContactTag: "Khuyên dùng",
+                instantResponse: "Phản hồi trực tuyến ngay",
+                wechatCardTitle: "Tư vấn qua WeChat",
+                wechatCardDesc: "Thêm WeChat xưởng để gửi thiết kế, yêu cầu mẫu và nhận báo giá bán buôn nhanh chóng.",
+                wechatIdLabel: "Mã WeChat ID",
+                copyWeChatBtn: "Sao chép WeChat ID",
+                directPhoneTag: "Hotline 24H",
+                directCallTitle: "Quản lý xưởng trực tiếp",
+                phoneCardTitle: "Gọi điện thoại trực tiếp",
+                phoneCardDesc: "Liên hệ đơn hàng gấp hoặc thảo luận quy cách kỹ thuật trực tiếp với quản lý xưởng.",
+                phoneCallLabel: "Số điện thoại",
+                callNowBtn: "Gọi ngay bây giờ",
+                addrTitle: "Địa chỉ",
+                addrText: "Thị trấn Tiểu Lam, Thành phố Trung Sơn, Tỉnh Quảng Đông, Trung Quốc",
+                hoursTitle: "Giờ làm việc",
+                footDesc: "Nhà cung cấp bao bì nhựa, màng co và vật liệu đóng gói uy tín tại Trung Quốc."
             },
             th: {
                 topBarDuty: "รองรับใบรับรอง Form E & RCEP (ภาษีนำเข้า 0-5%)",
                 topBarDDP: "บริการส่ง DDP รวมภาษีถึงประตูบ้านในไทยและทั่วโลก",
-                logoSub: "ShunXiang Packaging / ชุนเซียง แพคเกจจิ้ง",
+                logoSub: "Packaging / ชุนเซียง แพคเกจจิ้ง",
+                headWeChatBtn: "แอด WeChat",
                 navHome: "หน้าแรก",
                 navProducts: "สินค้า",
                 navAdvantages: "จุดเด่น",
                 navAbout: "เกี่ยวกับเรา",
                 navContact: "ติดต่อเรา",
+                wechatCallBtn: "คุย WeChat",
+                phoneCallBtn: "โทรทันที",
                 heroTag: "ส่งตรงจากโรงงาน • เมืองเสี่ยวหลาน ประเทศจีน",
                 heroTitle: "ผู้ให้บริการถุงพลาสติกและฟิล์มยืดอุตสาหกรรมครบวงจร",
-                heroDesc: "ผลิตและจำหน่ายฟิล์มยืดพันพาเลท ถุงซิปล็อค CPE เนื้อทราย ถุง PE/PO และซองกันกระแทก สำหรับ e-Commerce และโรงงาน",
+                heroDesc: "ผลิตและจำหน่ายฟิล์มยืดพันพาเลท ถุงซิปล็อค CPE เนื้อทราย ถุง PE/PO และซองกันกระแทก",
                 heroBadge1: "ขั้นต่ำน้อย สกรีนโลโก้ได้",
                 heroBadge2: "เม็ดพลาสติกใหม่ 100%",
                 heroBadge3: "รองรับ Form E ลดภาษี 0%",
                 heroBadge4: "ส่ง DDP ถึงหน้าบ้านในไทย",
-                heroBtnWhatsApp: "WeChat: 13802694295",
-                heroBtnSample: "ชมสินค้าทั้งหมด",
-                directContactTitle: "ช่องทางการติดต่อโดยตรง",
-                directContactDesc: "ติดต่อทีมงานฝ่ายผลิตในเสี่ยวหลานเพื่อสอบถามรายละเอียดและโซลูชันบรรจุภัณฑ์",
-                viewContactBtn: "ดูข้อมูลการติดต่อทั้งหมด",
+                heroBtnWeChat: "คุย WeChat: 13802694295",
+                heroBtnPhone: "โทรตรง: +86 138 0269 4295",
+                directContactTitle: "ช่องทาง WeChat และโทรศัพท์โดยตรง",
+                directContactDesc: "ติดต่อทีมงานฝ่ายผลิตในเสี่ยวหลานเพื่อสอบถามรายละเอียด ขอตัวอย่าง และขอใบเสนอราคาได้ทันที",
+                wechatLabel: "WeChat ID (คลิกเพื่อคัดลอก)",
+                copyBtnText: "คัดลอก ID",
+                phoneLabel: "สายด่วน 24 ชั่วโมง (คลิกเพื่อโทร)",
+                callBtnText: "โทรออก",
+                viewContactBtn: "ดูที่อยู่โรงงานและรายละเอียดการติดต่อ",
                 stat1: "พลาสติกใหม่ 100%",
                 stat2: "MOQ เริ่มต้นน้อย",
                 stat3: "ภาษี Form E 0-5%",
@@ -1014,102 +1194,53 @@
                 prodSubTitle: "สินค้าบรรจุภัณฑ์ครบวงจร",
                 prodMainTitle: "ถุงพลาสติกและบรรจุภัณฑ์อุตสาหกรรม",
                 prodDesc: "ความทนทานสูง ความใสชัดเจน รองรับน้ำหนักได้ดี ปรับแต่งได้ตามต้องการ",
-                p1Title: "ฟิล์มยืดพันพาเลท (拉伸膜)",
-                p1Desc: "ฟิล์มยืด LLDPE สำหรับพันด้วยมือและเครื่อง เหนียวขาดยาก ยึดเกาะดีเยี่ยม",
-                p1Spec1: "ความหนา: 15 - 50 ไมครอน",
-                p1Spec2: "สี: ใส, ดำ, น้ำเงิน",
-                p2Title: "สายรัดพลาสติก (打包带)",
-                p2Desc: "สายรัด PET & PP รับแรงดึงสูง สำหรับรัดกล่อง ไม้ และเครื่องจักรหนัก",
-                p2Spec1: "วัสดุ: PP / PET แรงดึงสูง",
-                p2Spec2: "สั่งทำขนาดและสีได้",
-                p3Title: "โฟม EPE กันกระแทก (珍珠棉)",
-                p3Desc: "แผ่นและถุงโฟม EPE กันรอยขีดข่วนและกันกระแทก เหมาะสำหรับงานฮาร์ดแวร์และอิเล็กทรอนิกส์",
-                p3Spec1: "สั่งตัดไดคัทตามขนาดได้",
-                p3Spec2: "มีออปชั่นป้องกันไฟฟ้าสถิต",
-                p4Title: "เทปกาวปิดกล่อง (封箱胶)",
-                p4Desc: "เทปกาว BOPP เหนียวพิเศษ มีสีใส สีน้ำตาล พิมพ์ลายเตือน และพิมพ์โลโก้แบรนด์",
-                p4Spec1: "แรงยึดเกาะสูง ทนอากาศ",
-                p4Spec2: "รับพิมพ์โลโก้แบรนด์",
-                p5Title: "ซองกันกระแทกบับเบิ้ล (气泡袋)",
-                p5Desc: "ถุงบับเบิ้ลและซองพลาสติกกันกระแทกพร้อมกาวทำลายล้าง ปลอดภัยสำหรับการส่งพัสดุ",
-                p5Spec1: "แถบกาวเหนียวแน่น ป้องกันการแกะ",
-                p5Spec2: "บับเบิ้ลหนาแน่น กันกระแทกดี",
-                p6Title: "ถุงพลาสติก PE (PE 胶袋)",
-                p6Desc: "ถุง PE ใส ถุงซิป และถุงเจาะรูระบายอากาศ เม็ดใหม่ฟู้ดเกรด ปลอดภัยไร้กลิ่น",
-                p6Spec1: "ซีลแน่น ไม่แตกง่าย",
-                p6Spec2: "สั่งเจาะรูระบายอากาศได้",
-                p7Title: "ถุงพลาสติก PO (PO 胶袋)",
-                p7Desc: "ถุง PO เหนียวพิเศษ เนื้อแมตต์ รับน้ำหนักได้เยอะ ประหยัดคุ้มค่าสำหรับใส่เสื้อผ้า",
-                p7Spec1: "ความแข็งสูง รับน้ำหนักได้มาก",
-                p7Spec2: "คุ้มค่าสำหรับการสั่งซื้อจำนวนมาก",
-                p8Title: "ถุงซิปล็อค CPE เนื้อทราย (CPE 磨砂拉链袋)",
-                p8Desc: "ถุงซิปผิวนุ่มสัมผัสหรูหรา ยอดนิยมสำหรับแบรนด์เสื้อผ้า ร่ม เสื้อผ้าแฟชั่น และรองเท้า",
-                p8Spec1: "ผิวสัมผัสนุ่ม กันรอย",
-                p8Spec2: "พิมพ์โลโก้และเจาะรูระบายอากาศ",
-                p9Title: "สั่งทำถุงพลาสติกตามแบบ (定制胶袋)",
-                p9Desc: "สั่งทำได้ทุกขนาด ความหนา สกรีนโลโก้หลายสี มีตัวเลือกย่อยสลายได้ (PLA/PBAT)",
-                p9Spec1: "ขั้นต่ำเริ่มต้นเพียง 3,000 ใบ",
-                p9Spec2: "บริการเขียนแบบฟรี",
-                contactLink: "ติดต่อเรา →",
-                advSubTitle: "ทำไมลูกค้าทั่วโลกเลือกเรา",
-                advMainTitle: "ออกแบบมาเพื่อการนำเข้าที่ง่ายดาย",
-                adv1Title: "ขั้นต่ำการสั่งผลิตน้อย",
-                adv1Desc: "สกรีนโลโก้เริ่มต้นเพียง 3,000 ใบ ช่วยลดทุนสำหรับแบรนด์เริ่มต้น",
-                adv2Title: "สิทธิประโยชน์ Form E & RCEP",
-                adv2Desc: "มีใบรับรอง Form E ช่วยลดภาษีนำเข้าในไทยเหลือ 0% - 5%",
-                adv3Title: "ส่ง DDP ถึงหน้าบ้าน",
-                adv3Desc: "บริการขนส่งเหมาภาษี DDP ส่งถึงกรุงเทพฯ และทั่วประเทศไทย",
-                adv4Title: "โรงงานตรงจากเสี่ยวหลาน",
-                adv4Desc: "วัตถุดิบตรงจากแหล่งผลิตในมณฑลกวางตุ้ง ได้ราคาถูกที่สุด",
-                aboutTag: "เกี่ยวกับ ShunXiang Packaging",
-                aboutTitle: "พันธมิตรบรรจุภัณฑ์ที่น่าเชื่อถือของคุณ",
-                aboutP1: "ShunXiang Packaging ตั้งอยู่ในเมืองเสี่ยวหลาน ตงซาน กว่างตง ศูนย์กลางการผลิตพลาสติกของจีน",
-                aboutP2: "เน้นความยืดหยุ่น MOQ น้อย ส่งตัวอย่างไว พร้อมดูแลลูกค้าผ่าน WeChat",
-                aboutStat1Title: "ตลาดทั่วโลก",
-                aboutStat1Desc: "ไทย, เอเชียตะวันออกเฉียงใต้, ตะวันออกกลาง",
-                aboutStat2Title: "จัดส่งรวดเร็ว",
-                aboutStat2Desc: "ตัวอย่าง 3-5 วัน, สินค้าจริง 7-10 วัน",
-                aboutStat3Title: "ยืดหยุ่นสูง",
-                aboutStat3Desc: "ออเดอร์เล็ก & OEM Custom",
-                aboutStat4Title: "เอกสารลดภาษี",
-                aboutStat4Desc: "รองรับ Form E, RCEP",
-                contactSubTitle: "ติดต่อเรา",
-                contactMainTitle: "ติดต่อเราโดยตรง",
-                contactDesc: "รับออเดอร์ทั้งในและต่างประเทศ โทรหาเราหรือแอด WeChat ได้เลย",
-                wechatNote: "รองรับภาษาอังกฤษ / จีน",
-                phoneNote: "เบอร์โทรศัพท์โรงงานโดยตรง",
+                prodInquireWeChat: "ขอราคาผ่าน WeChat",
+                prodInquirePhone: "โทรสอบถาม",
+                recContactTag: "แนะนำหลัก",
+                instantResponse: "ตอบกลับออนไลน์ทันที",
+                wechatCardTitle: "ปรึกษาผ่าน WeChat",
+                wechatCardDesc: "แอด WeChat โรงงานเพื่อส่งไฟล์สกรีน ตรวจแบบ และขอราคาส่งได้อย่างรวดเร็ว",
+                wechatIdLabel: "WeChat ID",
+                copyWeChatBtn: "คัดลอก WeChat ID",
+                directPhoneTag: "สายด่วน 24 ชม.",
+                directCallTitle: "ผู้จัดการโรงงานโดยตรง",
+                phoneCardTitle: "โทรศัพท์ติดต่อโดยตรง",
+                phoneCardDesc: "สำหรับออเดอร์ด่วน งานสั่งทำพิเศษ หรือสั่งซื้อจำนวนมาก โทรคุยกับผู้จัดการโรงงานได้โดยตรง",
+                phoneCallLabel: "เบอร์โทรศัพท์",
+                callNowBtn: "โทรทันที",
                 addrTitle: "ที่อยู่โรงงาน",
-                addrSub: "มณฑลกวางตุ้ง ประเทศจีน",
-                addrText: "เมืองเสี่ยวหลาน เมืองตงซาน",
+                addrText: "เมืองเสี่ยวหลาน เมืองตงซาน มณฑลกวางตุ้ง ประเทศจีน",
                 hoursTitle: "เวลาทำการ",
-                hoursSub: "วันจันทร์ - วันอาทิตย์",
-                footDesc: "ผู้ผลิตและส่งออกถุงพลาสติก ฟิล์มยืด และบรรจุภัณฑ์กันกระแทกคุณภาพสูงจากจีน",
-                clickCopy: "คัดลอก",
-                clickCall: "โทรออก",
-                wechatCopied: "คัดลอก WeChat ID (13802694295) เรียบร้อยแล้ว!",
-                phoneCopied: "คัดลอกเบอร์โทรศัพท์แล้ว กำลังเปิดหน้าต่างโทร..."
+                footDesc: "ผู้ผลิตและส่งออกถุงพลาสติก ฟิล์มยืด และบรรจุภัณฑ์กันกระแทกคุณภาพสูงจากจีน"
             },
             id: {
-                topBarDuty: "Mendukung Sertifikat Form E & RCEP (Bebas Bea 0-5%)",
-                topBarDDP: "Pengiriman DDP Langsung Sampai Rumah di Indonesia & Global",
-                logoSub: "ShunXiang Packaging / Kemasan ShunXiang",
+                topBarDuty: "Sertifikat Form E & RCEP (Bebas Bea 0-5%) Supported",
+                topBarDDP: "Pengiriman DDP Sampai Rumah di Indonesia & Global",
+                logoSub: "Packaging / Kemasan ShunXiang",
+                headWeChatBtn: "Tambah WeChat",
                 navHome: "Beranda",
                 navProducts: "Produk",
                 navAdvantages: "Keunggulan",
                 navAbout: "Tentang Kami",
                 navContact: "Kontak",
+                wechatCallBtn: "WeChat",
+                phoneCallBtn: "Telepon",
                 heroTag: "Pasokan Langsung Pabrik • Xiaolan, Tiongkok",
                 heroTitle: "Solusi Kemasan Plastik & Industri Terpadu",
-                heroDesc: "Menyediakan stretch film, kantong ziplock CPE frosted, kantong PE/PO, dan bubble mailer berkualitas untuk e-commerce dan industri.",
-                heroBadge1: "MOQ Rendah Cetak Logo Custom",
+                heroDesc: "Menyediakan stretch film, kantong ziplock CPE frosted, kantong PE/PO, dan bubble mailer untuk e-commerce dan industri.",
+                heroBadge1: "MOQ Rendah Cetak Logo",
                 heroBadge2: "100% Bahan Virgin Premium",
                 heroBadge3: "Dukungan Bebas Bea Form E",
                 heroBadge4: "Pengiriman DDP Sampai Tempat",
-                heroBtnWhatsApp: "WeChat: 13802694295",
-                heroBtnSample: "Jelajahi Produk",
-                directContactTitle: "Kontak & Dukungan Langsung",
-                directContactDesc: "Hubungi tim pabrik Xiaolan kami secara langsung untuk konsultasi produk dan kustomisasi kemasan.",
-                viewContactBtn: "Lihat Semua Informasi Kontak",
+                heroBtnWeChat: "Konsultasi WeChat: 13802694295",
+                heroBtnPhone: "Telepon Langsung: +86 138 0269 4295",
+                directContactTitle: "Saluran Kontak WeChat & Telepon Langsung",
+                directContactDesc: "Hubungi tim pabrik Xiaolan kami secara langsung melalui WeChat atau telepon untuk mendapatkan penawaran harga dan sampel secara cepat.",
+                wechatLabel: "WeChat ID (Klik untuk Salin)",
+                copyBtnText: "Salin ID",
+                phoneLabel: "Hotline 24 Jam (Klik untuk Telepon)",
+                callBtnText: "Telepon Sekarang",
+                viewContactBtn: "Lihat Lokasi & Detail Kontak Pabrik",
                 stat1: "100% Bahan Virgin",
                 stat2: "MOQ Custom Rendah",
                 stat3: "Tarif Form E 0-5%",
@@ -1117,89 +1248,60 @@
                 prodSubTitle: "Katalog Kemasan Lengkap",
                 prodMainTitle: "Produk Plastik & Kemasan Industri",
                 prodDesc: "Daya tahan tinggi, transparansi jernih, kuat menahan beban, dan dapat disesuaikan sepenuhnya.",
-                p1Title: "Stretch Film / Plastik Wrapping (拉伸膜)",
-                p1Desc: "Stretch film LLDPE untuk wrapping tangan & mesin. Tahan tusukan, daya rekat kuat untuk perlindungan palet.",
-                p1Spec1: "Ketebalan: 15 - 50 Micron",
-                p1Spec2: "Warna: Bening, Hitam, Biru",
-                p2Title: "Tali Strapping Band (打包带)",
-                p2Desc: "Tali strapping PET & PP heavy-duty untuk mengikat karton, kayu, dan mesin berat.",
-                p2Spec1: "Bahan: PP / PET High Tensile",
-                p2Spec2: "Ukuran & Warna Custom",
-                p3Title: "Foam EPE Pearl Cotton (珍珠棉)",
-                p3Desc: "Busa EPE anti-gores dan anti-guncangan. Perlindungan wajib untuk komponen elektronik dan barang pecah belah.",
-                p3Spec1: "Ketebalan & Potongan Custom",
-                p3Spec2: "Pilihan Anti-Statis",
-                p4Title: "Lakban Bening / BOPP Tape (封箱胶)",
-                p4Desc: "Lakban BOPP daya rekat kuat. Tersedia warna bening, cokelat, cetak peringatan, dan cetak logo merek.",
-                p4Spec1: "Daya Rekat Sangat Kuat",
-                p4Spec2: "Cetak Logo Brand Custom",
-                p5Title: "Bubble Mailer & Amplop Bubel (气泡袋)",
-                p5Desc: "Kantong gelembung perlindungan dengan perekat permanen. Sangat cocok untuk pengiriman e-commerce.",
-                p5Spec1: "Perekat Permanen Anti-Bocor",
-                p5Spec2: "Busa Gelembung Tahan Guncangan",
-                p6Title: "Kantong Plastik PE (PE 胶袋)",
-                p6Desc: "Kantong plastik PE bening, ziplock, dan kantong baju berlubang. Bahan bening tanpa bau.",
-                p6Spec1: "Las Samping Kuat Anti-Jebol",
-                p6Spec2: "Pilihan Lubang Udara",
-                p7Title: "Kantong Plastik PO (PO 胶袋)",
-                p7Desc: "Kantong PO tahan tarik tinggi, tekstur agak kaku. Ekonomis untuk kemasan baju dan pembungkus grosir.",
-                p7Spec1: "Sangat Kuat & Beban Tinggi",
-                p7Spec2: "Pilihan Ekonomis Jumlah Besar",
-                p8Title: "Kantong Ziplock CPE Frosted (CPE 磨砂拉链袋)",
-                p8Desc: "Kantong ziplock tekstur buram halus mewah. Terlaris untuk brand pakaian, baju renang, dan sepatu.",
-                p8Spec1: "Tekstur Buram Halus & Anti-Gores",
-                p8Spec2: "Cetak Logo & Lubang Udara",
-                p9Title: "Kantong Plastik Custom Logo (定制胶袋)",
-                p9Desc: "Custom ukuran, warna, ketebalan, dan cetak logo. Tersedia opsi bahan ramah lingkungan (PLA/PBAT).",
-                p9Spec1: "MOQ Rendah Mulai 3.000 Pcs",
-                p9Spec2: "Bantuan Desain Gratis",
-                contactLink: "Hubungi Kami →",
-                advSubTitle: "Mengapa Memilih ShunXiang",
-                advMainTitle: "Didesain Untuk Kemudahan Impor",
-                adv1Title: "MOQ Rendah",
-                adv1Desc: "Cetak logo custom mulai dari 3.000 pcs, cocok untuk brand yang baru berkembang.",
-                adv2Title: "Fasilitas Form E & RCEP",
-                adv2Desc: "Menyediakan sertifikat Form E untuk potongan bea masuk hingga 0% - 5% di Indonesia.",
-                adv3Title: "Pengiriman DDP Door-to-Door",
-                adv3Desc: "Layanan pengiriman bersih pajak DDP ke Jakarta, Surabaya, dan kota lainnya.",
-                adv4Title: "Pabrik Langsung Dari Xiaolan",
-                adv4Desc: "Akses langsung pabrik di Guangdong menjamin harga paling bersaing.",
-                aboutTag: "Tentang ShunXiang Packaging",
-                aboutTitle: "Mitra Kemasan Plastik Terpercaya Anda",
-                aboutP1: "ShunXiang Packaging berlokasi di Kota Xiaolan, Zhongshan, Guangdong - pusat manufaktur kemasan terbesar di Tiongkok.",
-                aboutP2: "Kami mengutamakan fleksibilitas: MOQ rendah, sampel cepat, dan layanan ramah via WeChat.",
-                aboutStat1Title: "Fokus Global",
-                aboutStat1Desc: "Indonesia, Asia Tenggara, Timur Tengah",
-                aboutStat2Title: "Waktu Cepat",
-                aboutStat2Desc: "Sampel 3-5 hari, Produksi 7-10 hari",
-                aboutStat3Title: "Sangat Fleksibel",
-                aboutStat3Desc: "Pesanan Kecil & OEM Custom",
-                aboutStat4Title: "Dokumen Bebas Bea",
-                aboutStat4Desc: "Mendukung Form E, RCEP",
-                contactSubTitle: "Hubungi Kami",
-                contactMainTitle: "Hubungi Kami Langsung",
-                contactDesc: "Melayani bisnis lokal & luar negeri. Silakan hubungi kami atau tambah WeChat!",
-                wechatNote: "Mendukung Bahasa Inggris / Mandarin",
-                phoneNote: "Saluran telepon pabrik langsung",
-                addrTitle: "Alamat Pabrik",
-                addrSub: "Provinsi Guangdong, Tiongkok",
-                addrText: "Kota Xiaolan, Kota Zhongshan",
+                prodInquireWeChat: "Harga via WeChat",
+                prodInquirePhone: "Tanya via Telepon",
+                recContactTag: "Rekomendasi Utama",
+                instantResponse: "Respon Cepat Online",
+                wechatCardTitle: "Konsultasi WeChat",
+                wechatCardDesc: "Tambahkan WeChat resmi pabrik untuk mengirimkan desain, sampel, dan penawaran grosir.",
+                wechatIdLabel: "WeChat ID",
+                copyWeChatBtn: "Salin WeChat ID",
+                directPhoneTag: "Hotline 24 Jam",
+                directCallTitle: "Manajer Pabrik Langsung",
+                phoneCardTitle: "Panggilan Telepon Langsung",
+                phoneCardDesc: "Untuk pesanan mendesak atau pesanan grosir jumlah besar, silakan hubungi saluran manajemen pabrik secara langsung.",
+                phoneCallLabel: "Nomor Telepon",
+                callNowBtn: "Telepon Sekarang",
+                addrTitle: "Alamat",
+                addrText: "Kota Xiaolan, Kota Zhongshan, Provinsi Guangdong, Tiongkok",
                 hoursTitle: "Jam Kerja",
-                hoursSub: "Senin - Minggu",
-                footDesc: "Pemasok terpercaya untuk kantong plastik, stretch film, dan kemasan pelindung industri.",
-                clickCopy: "Salin",
-                clickCall: "Panggil",
-                wechatCopied: "WeChat ID (13802694295) berhasil disalin!",
-                phoneCopied: "Nomor telepon disalin! Membuka panggilan..."
+                footDesc: "Pemasok terpercaya untuk kantong plastik, stretch film, dan kemasan pelindung industri."
             }
         };
 
-        let currentLang = 'en';
+        // One-click Copy WeChat Function with UI Toast Feedback
+        function copyWeChat(wechatId) {
+            // Executive fallback for document.execCommand
+            const tempInput = document.createElement('input');
+            tempInput.value = wechatId;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast(`WeChat ID: ${wechatId} Copied! (微信号已复制)`);
+            } catch (err) {
+                showToast(`WeChat ID: ${wechatId}`);
+            }
+            
+            document.body.removeChild(tempInput);
+        }
+
+        // Show Temporary Toast Message
+        function showToast(message) {
+            const toast = document.getElementById('copyToast');
+            const toastText = document.getElementById('toastText');
+            toastText.innerText = message;
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
 
         // Switch Language Function
         function changeLanguage(langKey) {
-            currentLang = langKey;
-            const data = translations[langKey] || translations.en;
+            const data = translations[langKey] || translations.zh;
             
             // Loop through all data-i18n attributes and replace inner text
             document.querySelectorAll('[data-i18n]').forEach(element => {
@@ -1219,63 +1321,9 @@
             menu.classList.toggle('hidden');
         }
 
-        // Toast 提示框控件
-        function showToast(message, isPhone = false) {
-            const toast = document.getElementById('toastNotice');
-            const toastMsg = document.getElementById('toastMsg');
-            const toastIcon = document.getElementById('toastIcon');
-
-            toastMsg.innerText = message;
-            if(isPhone) {
-                toastIcon.className = 'fa-solid fa-phone-volume text-blue-400 text-lg';
-            } else {
-                toastIcon.className = 'fa-solid fa-circle-check text-emerald-400 text-lg';
-            }
-
-            toast.classList.remove('translate-y-10', 'opacity-0', 'pointer-events-none');
-            toast.classList.add('translate-y-0', 'opacity-100');
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-10', 'opacity-0', 'pointer-events-none');
-            }, 3000);
-        }
-
-        // 1. 点击微信按钮：复制微信号到剪贴板
-        function copyWeChat(wechatId = '13802694295') {
-            navigator.clipboard.writeText(wechatId).then(() => {
-                const dict = translations[currentLang] || translations.en;
-                showToast(dict.wechatCopied || `WeChat ID (${wechatId}) copied!`, false);
-            }).catch(err => {
-                // Fallback for older browsers
-                const textArea = document.createElement("textarea");
-                textArea.value = wechatId;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand("copy");
-                document.body.removeChild(textArea);
-                const dict = translations[currentLang] || translations.en;
-                showToast(dict.wechatCopied || `WeChat ID (${wechatId}) copied!`, false);
-            });
-        }
-
-        // 2. 点击电话号码：复制号码并跳转拨打电话
-        function copyAndCall(phoneNumber = '+8613802694295') {
-            const cleanNumber = phoneNumber.replace(/\s+/g, '');
-            navigator.clipboard.writeText(cleanNumber).then(() => {
-                const dict = translations[currentLang] || translations.en;
-                showToast(dict.phoneCopied || 'Phone number copied! Dialing...', true);
-                setTimeout(() => {
-                    window.location.href = `tel:${cleanNumber}`;
-                }, 600);
-            }).catch(err => {
-                window.location.href = `tel:${cleanNumber}`;
-            });
-        }
-
         // Initialize language on page load
         window.addEventListener('DOMContentLoaded', () => {
-            const savedLang = localStorage.getItem('shunxiang_lang') || 'en';
+            const savedLang = localStorage.getItem('shunxiang_lang') || 'zh';
             const langSelect = document.getElementById('langSelect');
             if (langSelect) {
                 langSelect.value = savedLang;
