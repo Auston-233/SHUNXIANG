@@ -1,1613 +1,1339 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sphere Simulator</title>
-    <!-- Tailwind CSS -->
+    <title>ShunXiang Packaging</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
+    <!-- Font Awesome Icons CDN -->w
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-   	<link rel="icon" type="image/png" href="s.png">
-	<!-- Three.js Library & OrbitControls -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- 网站标签 Logo -->
+    <link rel="icon" type="image/png" href="3.png">
+    <!-- Apple 设备图标 -->
+    <link rel="apple-touch-icon" href="3.png">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            navy: '#0f3460',
+                            navyDark: '#0a2240',
+                            teal: '#2a9d8f',
+                            cyan: '#00b4d8',
+                            orange: '#f77f00',
+                            orangeHover: '#d96e00',
+                            lightBg: '#f8fafc',
+                            wechat: '#07c160',
+                            wechatHover: '#06ad56'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: #030308;
-            font-family: 'Inter', sans-serif;
-            color: #ffffff;
-            user-select: none;
+        .glass-header {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
-
-        .font-orbitron {
-            font-family: 'Orbitron', sans-serif;
+        .hero-gradient {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 50%, #1b262c 100%);
         }
-
-        /* Glassmorphism styling */
-        .glass-panel {
-            background: rgba(12, 16, 26, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-        }
-
-        .glass-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .card-hover {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .glass-btn:hover {
-            background: rgba(255, 255, 255, 0.18);
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.2);
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 30px -10px rgba(15, 52, 96, 0.2);
         }
-
-        .glass-btn.active {
-            background: linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(59, 130, 246, 0.4));
-            border-color: #06b6d4;
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
+        .pulse-subtle {
+            animation: pulse-ring 2s infinite;
         }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.4);
-        }
-
-        /* Canvas viewport */
-        #webgl-container {
-            width: 100vw;
-            height: 100vh;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-
-        /* Neon Glow Utility */
-        .neon-glow {
-            text-shadow: 0 0 10px rgba(6, 182, 212, 0.8), 0 0 20px rgba(6, 182, 212, 0.4);
-        }
-
-        /* Offscreen texture generator canvas */
-        #texture-canvas {
-            display: none;
+        @keyframes pulse-ring {
+            0% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(7, 193, 96, 0.6); }
+            70% { transform: scale(1); box-shadow: 0 0 0 12px rgba(7, 193, 96, 0); }
+            100% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(7, 193, 96, 0); }
         }
     </style>
 </head>
-<body class="relative min-h-screen overflow-hidden">
+<body class="bg-brand-lightBg text-slate-800 font-sans antialiased flex flex-col min-h-screen relative">
 
-    <!-- WebGL Render Container -->
-    <div id="webgl-container"></div>
+    <!-- Notification Toast Message Box -->
+    <div id="copyToast" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] hidden bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-slate-700 text-sm font-semibold transition-all">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toastText">WeChat ID Copied to Clipboard!</span>
+    </div>
 
-    <!-- Offscreen Procedural Texture Canvas (1024x512 equirectangular pattern projection) -->
-    <canvas id="texture-canvas" width="1024" height="512"></canvas>
-
-    <!-- UI Overlay Header -->
-    <header class="absolute top-0 left-0 w-full z-10 p-4 md:p-6 flex justify-between items-center pointer-events-none">
-        <div class="pointer-events-auto flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.5)]">
-                <i class="fa-solid font-bold fa-globe text-lg animate-spin" style="animation-duration: 12s;"></i>
+    <!-- Top Announcement & Quick Direct Contact Bar -->
+    <div class="bg-brand-navyDark text-white text-xs py-2.5 px-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 text-center sm:text-left">
+            <div class="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
+                <span><i class="fa-solid fa-certificate text-brand-cyan mr-1"></i> <span data-i18n="topBarDuty">Form E & RCEP 0-5% Duty-Free Certificate Supported</span></span>
+                <span class="hidden md:inline text-slate-500">|</span>
+                <span class="hidden md:inline"><i class="fa-solid fa-truck-fast text-brand-orange mr-1"></i> <span data-i18n="topBarDDP">DDP Shipping to SE Asia & Worldwide</span></span>
             </div>
-            <div>
-                <h1 class="font-orbitron font-extrabold text-xl md:text-2xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 neon-glow">
-                    SPHERE LAS VEGAS
-                </h1>
-                <p class="text-xs text-gray-400 font-mono tracking-widest">NEXT-GEN FACADE SIMULATOR</p>
+            <!-- Prominent Direct Contact Links -->
+            <div class="flex items-center gap-3 flex-wrap justify-center">
+                <button onclick="copyWeChat('13802694295')" class="hover:text-emerald-400 bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-md transition-all flex items-center gap-1.5 font-medium">
+                    <i class="fa-brands fa-weixin text-brand-wechat"></i> WeChat: 13802694295 <i class="fa-regular fa-copy text-[10px] opacity-70"></i>
+                </button>
+                <a href="tel:+8613802694295" class="hover:text-brand-cyan bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-md transition-all flex items-center gap-1.5 font-medium">
+                    <i class="fa-solid fa-phone text-brand-cyan"></i> Tel: +86 138 0269 4295
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-[33px] sm:top-[33px] z-40 glass-header border-b border-slate-200/80 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-brand-navy flex items-center justify-center text-white font-bold text-xl shadow-md group-hover:bg-brand-teal transition-colors">
+                    SX
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold text-brand-navy tracking-tight block leading-tight">ShunXiang</span>
+                    <span class="text-xs font-semibold text-brand-teal tracking-widest uppercase block" data-i18n="logoSub">Packaging / 顺祥胶袋</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center gap-8 font-medium text-slate-600 text-sm">
+                <a href="#home" class="hover:text-brand-navy transition-colors py-1" data-i18n="navHome">Home</a>
+                <a href="#products" class="hover:text-brand-navy transition-colors py-1" data-i18n="navProducts">Products</a>
+                <a href="#advantages" class="hover:text-brand-navy transition-colors py-1" data-i18n="navAdvantages">Why Us</a>
+                <a href="#about" class="hover:text-brand-navy transition-colors py-1" data-i18n="navAbout">About Us</a>
+                <a href="#contact" class="hover:text-brand-navy transition-colors py-1" data-i18n="navContact">Contact</a>
+            </nav>
+
+            <!-- Top Right Utilities (Lang Switcher & Quick CTA Button) -->
+            <div class="flex items-center gap-3">
+                <!-- Direct WeChat Button Header -->
+                <button onclick="copyWeChat('13802694295')" class="hidden sm:inline-flex items-center gap-2 bg-brand-wechat hover:bg-brand-wechatHover text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow transition-all">
+                    <i class="fa-brands fa-weixin text-base"></i>
+                    <span data-i18n="headWeChatBtn">Add WeChat</span>
+                </button>
+
+                <!-- Language Selector Dropdown -->
+                <div class="relative">
+                    <select id="langSelect" onchange="changeLanguage(this.value)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2 px-3 pr-7 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-cyan cursor-pointer appearance-none">
+                        <option value="zh">🇨🇳 中文 (Chinese)</option>
+                        <option value="en">🌐 English</option>
+                        <option value="vi">🇻🇳 Tiếng Việt</option>
+                        <option value="th">🇹🇭 ไทย (Thai)</option>
+                        <option value="id">🇮🇩 B. Indonesia</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-500 pointer-events-none"></i>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuBtn" onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-slate-600 hover:text-brand-navy hover:bg-slate-100">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
             </div>
         </div>
 
-        <!-- Quick Actions Top Bar -->
-        <div class="pointer-events-auto flex items-center gap-3">
-            <button id="btn-audio" class="glass-btn p-3 rounded-full text-white hover:text-cyan-400 flex items-center justify-center w-11 h-11" title="Toggle Sound Ambient">
-                <i class="fa-solid fa-volume-xmark" id="audio-icon"></i>
-            </button>
-            <button id="btn-rotate" class="glass-btn p-3 rounded-full text-white hover:text-cyan-400 flex items-center justify-center w-11 h-11 active" title="Toggle Auto Rotation">
-                <i class="fa-solid fa-rotate text-cyan-400"></i>
-            </button>
-            <button id="btn-fullscreen" class="glass-btn p-3 rounded-full text-white hover:text-cyan-400 flex items-center justify-center w-11 h-11" title="Fullscreen">
-                <i class="fa-solid fa-expand"></i>
-            </button>
+        <!-- Mobile Navigation Drawer -->
+        <div id="mobileMenu" class="hidden md:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-3 shadow-xl">
+            <a href="#home" onclick="toggleMobileMenu()" class="block py-2 text-slate-700 font-medium" data-i18n="navHome">Home</a>
+            <a href="#products" onclick="toggleMobileMenu()" class="block py-2 text-slate-700 font-medium" data-i18n="navProducts">Products</a>
+            <a href="#advantages" onclick="toggleMobileMenu()" class="block py-2 text-slate-700 font-medium" data-i18n="navAdvantages">Why Us</a>
+            <a href="#about" onclick="toggleMobileMenu()" class="block py-2 text-slate-700 font-medium" data-i18n="navAbout">About Us</a>
+            <a href="#contact" onclick="toggleMobileMenu()" class="block py-2 text-slate-700 font-medium" data-i18n="navContact">Contact</a>
+            
+            <div class="pt-3 border-t border-slate-100 grid grid-cols-2 gap-2">
+                <button onclick="copyWeChat('13802694295')" class="w-full flex items-center justify-center gap-2 bg-brand-wechat text-white font-bold py-2.5 rounded-xl shadow text-xs">
+                    <i class="fa-brands fa-weixin text-base"></i> <span data-i18n="wechatCallBtn">微信咨询</span>
+                </button>
+                <a href="tel:+8613802694295" class="w-full flex items-center justify-center gap-2 bg-brand-navy text-white font-bold py-2.5 rounded-xl shadow text-xs">
+                    <i class="fa-solid fa-phone text-base"></i> <span data-i18n="phoneCallBtn">电话直连</span>
+                </a>
+            </div>
         </div>
     </header>
 
-    <!-- Emoji Sub-Bar Drawer -->
-    <div id="emoji-drawer" class="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-10 w-[92%] max-w-4xl pointer-events-auto hidden transition-all duration-300">
-        <div class="glass-panel rounded-xl p-3 flex items-center gap-2 overflow-x-auto justify-start border-cyan-500/40">
-            <span class="text-xs font-mono text-cyan-400 px-2 font-bold whitespace-nowrap">EMOJI PACK:</span>
-            
-            <button class="emoji-sub-btn glass-btn px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 whitespace-nowrap active" data-emoji="happy">
-                <span>馃槉 Happy</span>
-            </button>
-            <button class="emoji-sub-btn glass-btn px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 whitespace-nowrap" data-emoji="cool">
-                <span>馃槑 Cool</span>
-            </button>
-            <button class="emoji-sub-btn glass-btn px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 whitespace-nowrap" data-emoji="wink">
-                <span>馃槣 Wink</span>
-            </button>
-            <button class="emoji-sub-btn glass-btn px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 whitespace-nowrap" data-emoji="heart_eyes">
-                <span>馃槏 Hearts</span>
-            </button>
-            <button class="emoji-sub-btn glass-btn px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 whitespace-nowrap" data-emoji="cry_laugh">
-                <span>馃槶 Cry-Laugh</span>
-            </button>
-            <button class="emoji-sub-btn glass-btn px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 whitespace-nowrap" data-emoji="thinking">
-                <span>馃 Thinking</span>
-            </button>
-            <button class="emoji-sub-btn glass-btn px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 whitespace-nowrap" data-emoji="shocked">
-                <span>馃槷 Shocked</span>
-            </button>
-            <button class="emoji-sub-btn glass-btn px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 whitespace-nowrap" data-emoji="angry">
-                <span>馃槨 Angry</span>
-            </button>
-            <button class="emoji-sub-btn glass-btn px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 whitespace-nowrap" data-emoji="sleepy">
-                <span>馃槾 Sleeping</span>
-            </button>
-            <button class="emoji-sub-btn glass-btn px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 whitespace-nowrap" data-emoji="mindblown">
-                <span>馃く Mindblown</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Preset Selector (Bottom Navigation Bar) -->
-    <nav class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10 w-[95%] max-w-5xl pointer-events-auto">
-        <div class="glass-panel rounded-2xl p-2 md:p-3 flex items-center gap-2 overflow-x-auto justify-start no-scrollbar">
-            
-            <button class="preset-btn glass-btn px-3.5 py-2 rounded-xl flex items-center gap-2 text-xs md:text-sm font-medium whitespace-nowrap active" data-preset="halloween">
-                <i class="fa-solid fa-jack-o-lantern text-orange-500 text-base"></i>
-                <span>Halloween</span>
-            </button>
-
-            <button class="preset-btn glass-btn px-3.5 py-2 rounded-xl flex items-center gap-2 text-xs md:text-sm font-medium whitespace-nowrap" data-preset="christmas">
-                <i class="fa-solid fa-snowflake text-cyan-300 text-base"></i>
-                <span>Christmas</span>
-            </button>
-
-            <button class="preset-btn glass-btn px-3.5 py-2 rounded-xl flex items-center gap-2 text-xs md:text-sm font-medium whitespace-nowrap" data-preset="fireworks">
-                <i class="fa-solid fa-champagne-glasses text-amber-300 text-base"></i>
-                <span>New Year</span>
-            </button>
-
-            <button class="preset-btn glass-btn px-3.5 py-2 rounded-xl flex items-center gap-2 text-xs md:text-sm font-medium whitespace-nowrap" data-preset="mid_autumn">
-                <i class="fa-solid fa-moon text-yellow-300 text-base"></i>
-                <span>Mid-Autumn</span>
-            </button>
-
-            <button class="preset-btn glass-btn px-3.5 py-2 rounded-xl flex items-center gap-2 text-xs md:text-sm font-medium whitespace-nowrap" data-preset="valentine">
-                <i class="fa-solid fa-heart text-pink-500 text-base"></i>
-                <span>Valentine</span>
-            </button>
-
-            <button class="preset-btn glass-btn px-3.5 py-2 rounded-xl flex items-center gap-2 text-xs md:text-sm font-medium whitespace-nowrap" data-preset="lantern">
-                <i class="fa-solid fa-lightbulb text-red-500 text-base"></i>
-                <span>Lantern Fest</span>
-            </button>
-
-            <button class="preset-btn glass-btn px-3.5 py-2 rounded-xl flex items-center gap-2 text-xs md:text-sm font-medium whitespace-nowrap" data-preset="emoji">
-                <i class="fa-solid fa-face-smile text-yellow-400 text-base"></i>
-                <span>Emoji (10)</span>
-            </button>
-
-            <button class="preset-btn glass-btn px-3.5 py-2 rounded-xl flex items-center gap-2 text-xs md:text-sm font-medium whitespace-nowrap" data-preset="cyberpunk">
-                <i class="fa-solid fa-eye text-fuchsia-400 text-base"></i>
-                <span>Cyber Eye</span>
-            </button>
-
-            <button class="preset-btn glass-btn px-3.5 py-2 rounded-xl flex items-center gap-2 text-xs md:text-sm font-medium whitespace-nowrap" data-preset="earth">
-                <i class="fa-solid fa-earth-americas text-emerald-400 text-base"></i>
-                <span>Earth</span>
-            </button>
-
-            <button class="preset-btn glass-btn px-3.5 py-2 rounded-xl flex items-center gap-2 text-xs md:text-sm font-medium whitespace-nowrap" data-preset="custom">
-                <i class="fa-solid fa-sliders text-cyan-400 text-base"></i>
-                <span>Custom</span>
-            </button>
-        </div>
-    </nav>
-
-    <!-- Side Control Panel -->
-    <aside id="custom-panel" class="absolute top-24 right-6 z-10 w-80 glass-panel rounded-2xl p-5 space-y-4 max-h-[calc(100vh-180px)] overflow-y-auto hidden pointer-events-auto transition-all duration-300">
-        <div class="flex items-center justify-between border-b border-gray-700/50 pb-3">
-            <h3 class="font-orbitron font-bold text-sm tracking-wider text-cyan-400 flex items-center gap-2">
-                <i class="fa-solid fa-sliders"></i> FACADE CONTROLLER
-            </h3>
-            <span class="text-[10px] bg-cyan-950 text-cyan-400 border border-cyan-800 px-2 py-0.5 rounded font-mono">LIVE</span>
-        </div>
-
-        <div class="space-y-4 text-xs">
-            <div>
-                <label class="block text-gray-300 font-medium mb-1.5">Pattern Mode</label>
-                <select id="ctrl-mode" class="w-full bg-slate-900/90 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-cyan-500">
-                    <option value="matrix">Matrix Data Grid</option>
-                    <option value="waves">Sine Energy Waves</option>
-                    <option value="text">Custom Neon Text</option>
-                    <option value="rings">Concentric Pulse Rings</option>
-                </select>
-            </div>
-
-            <div id="text-input-group">
-                <label class="block text-gray-300 font-medium mb-1.5">Display Text</label>
-                <input type="text" id="ctrl-text" value="WELCOME TO VEGAS" class="w-full bg-slate-900/90 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-cyan-500 font-mono text-xs" maxlength="24">
-            </div>
-
-            <div class="flex items-center justify-between">
-                <label class="text-gray-300 font-medium">Primary Glow</label>
-                <input type="color" id="ctrl-color1" value="#00f0ff" class="w-8 h-8 rounded border-0 bg-transparent cursor-pointer">
-            </div>
-
-            <div class="flex items-center justify-between">
-                <label class="text-gray-300 font-medium">Secondary Accent</label>
-                <input type="color" id="ctrl-color2" value="#ff00a0" class="w-8 h-8 rounded border-0 bg-transparent cursor-pointer">
-            </div>
-
-            <div>
-                <div class="flex justify-between mb-1">
-                    <label class="text-gray-300 font-medium">Animation Speed</label>
-                    <span id="val-speed" class="text-gray-400 font-mono">1.0x</span>
-                </div>
-                <input type="range" id="ctrl-speed" min="0.1" max="3" step="0.1" value="1.0" class="w-full accent-cyan-400">
-            </div>
-
-            <div>
-                <div class="flex justify-between mb-1">
-                    <label class="text-gray-300 font-medium">LED Matrix Pixelation</label>
-                    <span id="val-density" class="text-gray-400 font-mono">High</span>
-                </div>
-                <input type="range" id="ctrl-density" min="16" max="128" step="16" value="64" class="w-full accent-cyan-400">
-            </div>
-
-            <div>
-                <div class="flex justify-between mb-1">
-                    <label class="text-gray-300 font-medium">Facade Emission Intensity</label>
-                    <span id="val-intensity" class="text-gray-400 font-mono">1.5</span>
-                </div>
-                <input type="range" id="ctrl-intensity" min="0.5" max="3.0" step="0.1" value="1.5" class="w-full accent-cyan-400">
-            </div>
-        </div>
-    </aside>
-
-    <!-- Info Tooltip Overlay -->
-    <div class="absolute top-24 left-6 z-10 glass-panel rounded-xl p-4 hidden md:block max-w-xs pointer-events-none">
-        <h4 class="font-orbitron text-xs font-semibold text-cyan-400 mb-1 flex items-center gap-1.5">
-            <i class="fa-solid fa-circle-info"></i> INTERACTIVE CONTROLS
-        </h4>
-        <ul class="text-[11px] text-gray-300 space-y-1 font-mono">
-            <li>鈥�Left Click + Drag: Rotate Camera</li>
-            <li>鈥�Mouse Wheel: Zoom In / Out</li>
-            <li>鈥�Right Click + Drag: Pan View</li>
-        </ul>
-    </div>
-
-    <!-- Application Script -->
-    <script>
-        // --- 1. Audio Engine ---
-        class SphereAudioEngine {
-            constructor() {
-                this.ctx = null;
-                this.isPlaying = false;
-                this.ambientOsc = null;
-                this.gainNode = null;
-                this.presetSoundTimer = null;
-            }
-
-            init() {
-                if (!this.ctx) {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    this.ctx = new AudioContext();
-                }
-            }
-
-            toggle() {
-                this.init();
-                if (this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
-
-                if (this.isPlaying) {
-                    this.stop();
-                } else {
-                    this.start();
-                }
-                return this.isPlaying;
-            }
-
-            start() {
-                if (this.isPlaying) return;
-                this.isPlaying = true;
-
-                this.ambientOsc = this.ctx.createOscillator();
-                const filter = this.ctx.createBiquadFilter();
-                this.gainNode = this.ctx.createGain();
-
-                this.ambientOsc.type = 'sawtooth';
-                this.ambientOsc.frequency.setValueAtTime(55, this.ctx.currentTime);
-
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(220, this.ctx.currentTime);
-
-                this.gainNode.gain.setValueAtTime(0.08, this.ctx.currentTime);
-
-                this.ambientOsc.connect(filter);
-                filter.connect(this.gainNode);
-                this.gainNode.connect(this.ctx.destination);
-
-                this.ambientOsc.start();
-                this.triggerRandomBeeps();
-            }
-
-            stop() {
-                if (!this.isPlaying) return;
-                this.isPlaying = false;
-                if (this.ambientOsc) {
-                    this.ambientOsc.stop();
-                    this.ambientOsc.disconnect();
-                }
-                if (this.presetSoundTimer) clearTimeout(this.presetSoundTimer);
-            }
-
-            triggerRandomBeeps() {
-                if (!this.isPlaying) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                const freq = [220, 277.18, 329.63, 440, 554.37, 659.25][Math.floor(Math.random() * 6)];
-
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-
-                gain.gain.setValueAtTime(0.01, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 1.5);
-
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-
-                osc.start();
-                osc.stop(this.ctx.currentTime + 1.5);
-
-                this.presetSoundTimer = setTimeout(() => this.triggerRandomBeeps(), 1500 + Math.random() * 2500);
-            }
-
-            playFireworkPop() {
-                if (!this.isPlaying) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(300, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.3);
-
-                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
-
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.3);
-            }
-        }
-
-        const audioEngine = new SphereAudioEngine();
-
-        // --- 2. Dynamic Procedural Canvas Texture Generator ---
-        class FacadeTextureGenerator {
-            constructor(canvasId) {
-                this.canvas = document.getElementById(canvasId);
-                this.ctx = this.canvas.getContext('2d');
-                this.width = this.canvas.width;
-                this.height = this.canvas.height;
-                
-                this.currentPreset = 'halloween';
-                this.activeEmoji = 'happy'; // Default active emoji variant
-                this.time = 0;
-                
-                this.params = {
-                    mode: 'matrix',
-                    text: 'WELCOME TO VEGAS',
-                    color1: '#00f0ff',
-                    color2: '#ff00a0',
-                    speed: 1.0,
-                    density: 64,
-                    intensity: 1.5
-                };
-
-                // Snowflake particles for Christmas
-                this.snowflakes = Array.from({ length: 120 }, () => ({
-                    x: Math.random() * this.width,
-                    y: Math.random() * this.height,
-                    r: Math.random() * 3 + 1,
-                    s: Math.random() * 1.5 + 0.5
-                }));
-
-                // Floating Hearts for Valentine
-                this.hearts = Array.from({ length: 30 }, () => ({
-                    x: Math.random() * this.width,
-                    y: Math.random() * this.height,
-                    size: Math.random() * 15 + 10,
-                    speed: Math.random() * 2 + 1,
-                    opacity: Math.random() * 0.7 + 0.3
-                }));
-
-                // Floating Lanterns
-                this.lanterns = Array.from({ length: 18 }, () => ({
-                    x: Math.random() * this.width,
-                    y: Math.random() * this.height,
-                    scale: Math.random() * 0.4 + 0.6,
-                    speed: Math.random() * 0.8 + 0.4
-                }));
-
-                this.fireworks = [];
-            }
-
-            update(delta) {
-                this.time += delta * this.params.speed;
-
-                this.ctx.fillStyle = '#000000';
-                this.ctx.fillRect(0, 0, this.width, this.height);
-
-                switch (this.currentPreset) {
-                    case 'halloween':
-                        this.renderHalloween();
-                        break;
-                    case 'christmas':
-                        this.renderChristmas();
-                        break;
-                    case 'fireworks':
-                        this.renderFireworks();
-                        break;
-                    case 'mid_autumn':
-                        this.renderMidAutumn();
-                        break;
-                    case 'valentine':
-                        this.renderValentine();
-                        break;
-                    case 'lantern':
-                        this.renderLanternFest();
-                        break;
-                    case 'cyberpunk':
-                        this.renderCyberpunk();
-                        break;
-                    case 'emoji':
-                        this.render10EmojiPack();
-                        break;
-                    case 'earth':
-                        this.renderEarth();
-                        break;
-                    case 'custom':
-                        this.renderCustom();
-                        break;
-                }
-
-                this.applyLEDMatrixOverlay();
-            }
-
-            applyLEDMatrixOverlay() {
-                const step = Math.floor(1024 / this.params.density);
-                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-                for (let x = 0; x < this.width; x += step) {
-                    this.ctx.fillRect(x, 0, 1, this.height);
-                }
-                for (let y = 0; y < this.height; y += step) {
-                    this.ctx.fillRect(0, y, this.width, 1);
-                }
-            }
-
-            // --- HOLIDAY PRESETS ---
-
-            // 1. Halloween
-            renderHalloween() {
-                const w = this.width;
-                const h = this.height;
-                const grad = this.ctx.createLinearGradient(0, 0, 0, h);
-                const pulse = Math.sin(this.time * 3) * 0.15 + 0.85;
-                grad.addColorStop(0, '#1a0500');
-                grad.addColorStop(0.5, '#d94800');
-                grad.addColorStop(1, '#3a0800');
-                this.ctx.fillStyle = grad;
-                this.ctx.fillRect(0, 0, w, h);
-
-                this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
-                this.ctx.lineWidth = 12;
-                for (let i = 0; i < w; i += 90) {
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(i, 0);
-                    this.ctx.quadraticCurveTo(i + 30 * Math.sin(i), h / 2, i, h);
-                    this.ctx.stroke();
-                }
-
-                const cx = w * 0.5;
-                const cy = h * 0.48;
-
-                this.ctx.fillStyle = `#ffea00`;
-                this.ctx.shadowColor = '#ff5500';
-                this.ctx.shadowBlur = 40 * pulse;
-
-                const eyePulse = Math.sin(this.time * 5) * 5;
-                
-                this.ctx.beginPath();
-                this.ctx.moveTo(cx - 160, cy - 60);
-                this.ctx.lineTo(cx - 80, cy - 120 + eyePulse);
-                this.ctx.lineTo(cx - 60, cy - 30);
-                this.ctx.closePath();
-                this.ctx.fill();
-
-                this.ctx.beginPath();
-                this.ctx.moveTo(cx + 160, cy - 60);
-                this.ctx.lineTo(cx + 80, cy - 120 + eyePulse);
-                this.ctx.lineTo(cx + 60, cy - 30);
-                this.ctx.closePath();
-                this.ctx.fill();
-
-                this.ctx.beginPath();
-                this.ctx.moveTo(cx, cy - 20);
-                this.ctx.lineTo(cx - 25, cy + 20);
-                this.ctx.lineTo(cx + 25, cy + 20);
-                this.ctx.closePath();
-                this.ctx.fill();
-
-                this.ctx.beginPath();
-                this.ctx.moveTo(cx - 220, cy + 60);
-                this.ctx.quadraticCurveTo(cx, cy + 180, cx + 220, cy + 60);
-                this.ctx.lineTo(cx + 170, cy + 80);
-                this.ctx.lineTo(cx + 130, cy + 50);
-                this.ctx.lineTo(cx + 90, cy + 90);
-                this.ctx.lineTo(cx + 40, cy + 50);
-                this.ctx.lineTo(cx, cy + 90);
-                this.ctx.lineTo(cx - 40, cy + 50);
-                this.ctx.lineTo(cx - 90, cy + 90);
-                this.ctx.lineTo(cx - 130, cy + 50);
-                this.ctx.lineTo(cx - 170, cy + 80);
-                this.ctx.closePath();
-                this.ctx.fill();
-
-                this.ctx.shadowBlur = 0;
-            }
-
-            // 2. Christmas
-            renderChristmas() {
-                const w = this.width;
-                const h = this.height;
-
-                const grad = this.ctx.createRadialGradient(w/2, h/2, 50, w/2, h/2, w/2);
-                grad.addColorStop(0, '#a8071a');
-                grad.addColorStop(0.7, '#6b000b');
-                grad.addColorStop(1, '#002c11');
-                this.ctx.fillStyle = grad;
-                this.ctx.fillRect(0, 0, w, h);
-
-                this.ctx.fillStyle = '#0f5132';
-                for (let x = -w; x < w * 2; x += 120) {
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(x + Math.sin(this.time + x) * 20, 0);
-                    this.ctx.lineTo(x + 60 + Math.sin(this.time + x) * 20, 0);
-                    this.ctx.lineTo(x - 100, h);
-                    this.ctx.lineTo(x - 160, h);
-                    this.ctx.fill();
-                }
-
-                const colors = ['#ff4d4f', '#52c41a', '#ffec3d', '#1890ff', '#ffffff'];
-                for (let i = 0; i < 40; i++) {
-                    const lx = (i * 55 + this.time * 20) % w;
-                    const ly = 100 + Math.sin(i + this.time * 2) * 80;
-                    const flash = Math.sin(this.time * 6 + i) > 0;
-                    this.ctx.fillStyle = flash ? colors[i % colors.length] : '#333';
-                    this.ctx.shadowColor = colors[i % colors.length];
-                    this.ctx.shadowBlur = flash ? 15 : 0;
-                    this.ctx.beginPath();
-                    this.ctx.arc(lx, ly, 10, 0, Math.PI * 2);
-                    this.ctx.fill();
-                }
-                this.ctx.shadowBlur = 0;
-
-                this.ctx.fillStyle = '#ffffff';
-                this.snowflakes.forEach(s => {
-                    s.y += s.s;
-                    s.x += Math.sin(this.time + s.y * 0.05) * 0.5;
-                    if (s.y > h) s.y = -10;
-                    if (s.x > w) s.x = 0;
-                    if (s.x < 0) s.x = w;
-
-                    this.ctx.beginPath();
-                    this.ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-                    this.ctx.fill();
-                });
-
-                this.ctx.font = '900 48px Orbitron, sans-serif';
-                this.ctx.textAlign = 'center';
-                this.ctx.fillStyle = '#ffffff';
-                this.ctx.shadowColor = '#52c41a';
-                this.ctx.shadowBlur = 20;
-                this.ctx.fillText("MERRY CHRISTMAS", w * 0.5, h * 0.55);
-                this.ctx.shadowBlur = 0;
-            }
-
-            // 3. New Year Fireworks
-            renderFireworks() {
-                const w = this.width;
-                const h = this.height;
-
-                this.ctx.fillStyle = 'rgba(5, 5, 16, 0.25)';
-                this.ctx.fillRect(0, 0, w, h);
-
-                if (Math.random() < 0.1) {
-                    const fx = Math.random() * w;
-                    const fy = 100 + Math.random() * (h * 0.5);
-                    const color = ['#ff0055', '#00f0ff', '#ffea00', '#52c41a', '#ff9900'][Math.floor(Math.random() * 5)];
+    <!-- Main Content Container -->
+    <main class="flex-grow">
+
+        <!-- Hero Section -->
+        <section id="home" class="hero-gradient text-white relative overflow-hidden py-16 lg:py-24">
+            <div class="absolute -top-24 -left-24 w-96 h-96 bg-brand-teal/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-brand-cyan/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-12 gap-12 items-center">
                     
-                    audioEngine.playFireworkPop();
+                    <!-- Left Hero Text -->
+                    <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur border border-white/20 text-brand-cyan text-xs font-semibold tracking-wide uppercase">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span data-i18n="heroTag">Direct Factory Supply • Xiaolan, China</span>
+                        </div>
 
-                    for (let p = 0; p < 40; p++) {
-                        const angle = (Math.PI * 2 / 40) * p;
-                        const speed = Math.random() * 6 + 2;
-                        this.fireworks.push({
-                            x: fx,
-                            y: fy,
-                            vx: Math.cos(angle) * speed,
-                            vy: Math.sin(angle) * speed,
-                            color: color,
-                            alpha: 1.0,
-                            life: Math.random() * 30 + 30
-                        });
-                    }
-                }
+                        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight" data-i18n="heroTitle">
+                            一站式软包装与工业包装出海解决方案
+                        </h1>
 
-                for (let i = this.fireworks.length - 1; i >= 0; i--) {
-                    const p = this.fireworks[i];
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.vy += 0.08;
-                    p.alpha -= 0.02;
+                        <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed" data-i18n="heroDesc">
+                            为全球跨境电商、服装品牌及工业客户提供高品质拉伸膜、CPE磨砂拉链袋、PE/PO平口袋及气泡缓冲袋。
+                        </p>
 
-                    if (p.alpha <= 0) {
-                        this.fireworks.splice(i, 1);
-                        continue;
-                    }
+                        <!-- Highlights Badge Row -->
+                        <div class="pt-2 grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
+                            <div class="bg-white/5 border border-white/10 p-3 rounded-xl">
+                                <div class="text-brand-cyan font-bold text-lg">3,000 Pcs</div>
+                                <div class="text-xs text-slate-300" data-i18n="heroBadge1">Low MOQ Custom Logo</div>
+                            </div>
+                            <div class="bg-white/5 border border-white/10 p-3 rounded-xl">
+                                <div class="text-emerald-400 font-bold text-lg">100% Virgin</div>
+                                <div class="text-xs text-slate-300" data-i18n="heroBadge2">High Tensile & Tear Resistant</div>
+                            </div>
+                            <div class="bg-white/5 border border-white/10 p-3 rounded-xl">
+                                <div class="text-amber-400 font-bold text-lg">Form E / RCEP</div>
+                                <div class="text-xs text-slate-300" data-i18n="heroBadge3">0% Tariff Clearances</div>
+                            </div>
+                            <div class="bg-white/5 border border-white/10 p-3 rounded-xl">
+                                <div class="text-brand-orange font-bold text-lg">DDP Door</div>
+                                <div class="text-xs text-slate-300" data-i18n="heroBadge4">Southeast Asia & Global</div>
+                            </div>
+                        </div>
 
-                    this.ctx.fillStyle = p.color;
-                    this.ctx.globalAlpha = p.alpha;
-                    this.ctx.shadowColor = p.color;
-                    this.ctx.shadowBlur = 10;
-                    this.ctx.beginPath();
-                    this.ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
-                    this.ctx.fill();
-                }
-                this.ctx.globalAlpha = 1.0;
-                this.ctx.shadowBlur = 0;
-
-                const textScale = Math.sin(this.time * 4) * 5 + 56;
-                this.ctx.font = `900 ${textScale}px Orbitron, sans-serif`;
-                this.ctx.textAlign = 'center';
-                this.ctx.fillStyle = '#ffea00';
-                this.ctx.shadowColor = '#ff0055';
-                this.ctx.shadowBlur = 30;
-                this.ctx.fillText("HAPPY NEW YEAR", w * 0.5, h * 0.48);
-                
-                this.ctx.font = '900 64px Orbitron, sans-serif';
-                this.ctx.fillStyle = '#00f0ff';
-                this.ctx.fillText("2027", w * 0.5, h * 0.65);
-                this.ctx.shadowBlur = 0;
-            }
-
-            // 4. Mid-Autumn Festival (涓鑺�
-            renderMidAutumn() {
-                const w = this.width;
-                const h = this.height;
-
-                const bgGrad = this.ctx.createLinearGradient(0, 0, 0, h);
-                bgGrad.addColorStop(0, '#020514');
-                bgGrad.addColorStop(0.6, '#0b193c');
-                bgGrad.addColorStop(1, '#1b0f38');
-                this.ctx.fillStyle = bgGrad;
-                this.ctx.fillRect(0, 0, w, h);
-
-                const cx = w * 0.5;
-                const cy = h * 0.42;
-
-                // Glowing Giant Golden Full Moon
-                const moonGrad = this.ctx.createRadialGradient(cx, cy, 20, cx, cy, 140);
-                moonGrad.addColorStop(0, '#ffffff');
-                moonGrad.addColorStop(0.5, '#ffe600');
-                moonGrad.addColorStop(1, '#ffaa00');
-                
-                this.ctx.shadowColor = '#ffea00';
-                this.ctx.shadowBlur = 50;
-                this.ctx.fillStyle = moonGrad;
-                this.ctx.beginPath();
-                this.ctx.arc(cx, cy, 130, 0, Math.PI * 2);
-                this.ctx.fill();
-                this.ctx.shadowBlur = 0;
-
-                // Moving Wispy Golden Clouds
-                this.ctx.fillStyle = 'rgba(255, 235, 170, 0.2)';
-                for (let i = 0; i < 3; i++) {
-                    const cloudX = (cx - 200 + i * 180 + Math.sin(this.time + i) * 40) % w;
-                    this.ctx.beginPath();
-                    this.ctx.ellipse(cloudX, cy + 30 * i - 20, 140, 25, 0, 0, Math.PI * 2);
-                    this.ctx.fill();
-                }
-
-                // Jade Rabbit Silhouette Hopping
-                const rx = cx + Math.sin(this.time * 2) * 60;
-                const ry = cy + 40 - Math.abs(Math.cos(this.time * 4)) * 25;
-                
-                this.ctx.fillStyle = '#ffffff';
-                this.ctx.beginPath();
-                this.ctx.arc(rx, ry, 18, 0, Math.PI * 2); // Body
-                this.ctx.arc(rx + 12, ry - 14, 11, 0, Math.PI * 2); // Head
-                this.ctx.ellipse(rx + 10, ry - 30, 4, 12, -0.2, 0, Math.PI * 2); // Ear 1
-                this.ctx.ellipse(rx + 17, ry - 28, 4, 12, 0.2, 0, Math.PI * 2); // Ear 2
-                this.ctx.arc(rx - 16, ry + 8, 5, 0, Math.PI * 2); // Tail
-                this.ctx.fill();
-
-                // Calligraphy Text
-                this.ctx.font = '900 44px Orbitron, sans-serif';
-                this.ctx.textAlign = 'center';
-                this.ctx.fillStyle = '#ffeaa7';
-                this.ctx.shadowColor = '#fdcb6e';
-                this.ctx.shadowBlur = 15;
-                this.ctx.fillText("HAPPY MID-AUTUMN", cx, h * 0.82);
-                this.ctx.shadowBlur = 0;
-            }
-
-            // 5. Valentine's Day (鎯呬汉鑺�
-            renderValentine() {
-                const w = this.width;
-                const h = this.height;
-
-                const bgGrad = this.ctx.createRadialGradient(w/2, h/2, 50, w/2, h/2, w/2);
-                bgGrad.addColorStop(0, '#590925');
-                bgGrad.addColorStop(0.7, '#2b0515');
-                bgGrad.addColorStop(1, '#120008');
-                this.ctx.fillStyle = bgGrad;
-                this.ctx.fillRect(0, 0, w, h);
-
-                // Floating Heart Particles
-                this.hearts.forEach(hItem => {
-                    hItem.y -= hItem.speed;
-                    if (hItem.y < -30) hItem.y = h + 20;
-
-                    this.drawHeart(hItem.x + Math.sin(this.time + hItem.y * 0.02) * 15, hItem.y, hItem.size, '#ff4d6d', hItem.opacity);
-                });
-
-                // Central Giant Pulsing Heart
-                const scale = 1 + Math.sin(this.time * 4) * 0.08;
-                const cx = w * 0.5;
-                const cy = h * 0.45;
-                this.drawHeart(cx, cy, 120 * scale, '#ff0054', 1.0, true);
-
-                this.ctx.font = '900 48px Orbitron, sans-serif';
-                this.ctx.textAlign = 'center';
-                this.ctx.fillStyle = '#ffffff';
-                this.ctx.shadowColor = '#ff0054';
-                this.ctx.shadowBlur = 25;
-                this.ctx.fillText("BE MY VALENTINE", cx, h * 0.82);
-                this.ctx.shadowBlur = 0;
-            }
-
-            // Helper to draw Heart Shape
-            drawHeart(x, y, size, color, alpha = 1.0, glow = false) {
-                this.ctx.save();
-                this.ctx.translate(x, y);
-                this.ctx.globalAlpha = alpha;
-                if (glow) {
-                    this.ctx.shadowColor = color;
-                    this.ctx.shadowBlur = 30;
-                }
-                this.ctx.fillStyle = color;
-                this.ctx.beginPath();
-                const d = size;
-                this.ctx.moveTo(0, 0);
-                this.ctx.bezierCurveTo(-d / 2, -d / 2, -d, d / 3, 0, d);
-                this.ctx.bezierCurveTo(d, d / 3, d / 2, -d / 2, 0, 0);
-                this.ctx.fill();
-                this.ctx.restore();
-            }
-
-            // 6. Lantern Festival (鍏冨鑺�
-            renderLanternFest() {
-                const w = this.width;
-                const h = this.height;
-
-                this.ctx.fillStyle = '#0a0204';
-                this.ctx.fillRect(0, 0, w, h);
-
-                // Animated Floating Red Lanterns
-                this.lanterns.forEach(l => {
-                    l.y -= l.speed;
-                    if (l.y < -60) l.y = h + 40;
-
-                    const lx = l.x + Math.sin(this.time * 1.5 + l.y) * 20;
-                    const ly = l.y;
-                    const s = l.scale;
-
-                    // Red Glow Body
-                    this.ctx.shadowColor = '#ff0000';
-                    this.ctx.shadowBlur = 25 * s;
-                    this.ctx.fillStyle = '#d90429';
-                    this.ctx.beginPath();
-                    this.ctx.ellipse(lx, ly, 25 * s, 32 * s, 0, 0, Math.PI * 2);
-                    this.ctx.fill();
-                    this.ctx.shadowBlur = 0;
-
-                    // Gold Caps
-                    this.ctx.fillStyle = '#ffb703';
-                    this.ctx.fillRect(lx - 15 * s, ly - 36 * s, 30 * s, 6 * s);
-                    this.ctx.fillRect(lx - 15 * s, ly + 30 * s, 30 * s, 6 * s);
-
-                    // Tassel
-                    this.ctx.strokeStyle = '#ffb703';
-                    this.ctx.lineWidth = 2 * s;
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(lx, ly + 36 * s);
-                    this.ctx.lineTo(lx, ly + 55 * s);
-                    this.ctx.stroke();
-                });
-
-                // Central Title
-                this.ctx.font = '900 50px Orbitron, sans-serif';
-                this.ctx.textAlign = 'center';
-                this.ctx.fillStyle = '#ffb703';
-                this.ctx.shadowColor = '#d90429';
-                this.ctx.shadowBlur = 25;
-                this.ctx.fillText("LANTERN FESTIVAL", w * 0.5, h * 0.52);
-                this.ctx.shadowBlur = 0;
-            }
-
-            // 7. Cyberpunk Digital Eye
-            renderCyberpunk() {
-                const w = this.width;
-                const h = this.height;
-
-                this.ctx.fillStyle = '#030712';
-                this.ctx.fillRect(0, 0, w, h);
-
-                const cx = w * 0.5;
-                const cy = h * 0.5;
-
-                for (let i = 1; i <= 4; i++) {
-                    this.ctx.strokeStyle = i % 2 === 0 ? '#00f0ff' : '#ff0077';
-                    this.ctx.lineWidth = 2;
-                    this.ctx.beginPath();
-                    this.ctx.arc(cx, cy, i * 60 + Math.sin(this.time * 2) * 5, 0, Math.PI * 2);
-                    this.ctx.stroke();
-                }
-
-                this.ctx.save();
-                this.ctx.translate(cx, cy);
-                this.ctx.rotate(this.time * 0.8);
-                this.ctx.strokeStyle = '#00f0ff';
-                this.ctx.lineWidth = 6;
-                this.ctx.setLineDash([40, 20, 10, 20]);
-                this.ctx.beginPath();
-                this.ctx.arc(0, 0, 180, 0, Math.PI * 2);
-                this.ctx.stroke();
-                this.ctx.restore();
-
-                const irisGrad = this.ctx.createRadialGradient(cx, cy, 20, cx, cy, 120);
-                irisGrad.addColorStop(0, '#000000');
-                irisGrad.addColorStop(0.3, '#ff0055');
-                irisGrad.addColorStop(0.7, '#00f0ff');
-                irisGrad.addColorStop(1, '#000000');
-                
-                this.ctx.fillStyle = irisGrad;
-                this.ctx.beginPath();
-                this.ctx.arc(cx, cy, 120, 0, Math.PI * 2);
-                this.ctx.fill();
-
-                const pupilX = cx + Math.sin(this.time * 2.5) * 40;
-                this.ctx.fillStyle = '#ffffff';
-                this.ctx.shadowColor = '#00f0ff';
-                this.ctx.shadowBlur = 30;
-                this.ctx.beginPath();
-                this.ctx.arc(pupilX, cy, 35, 0, Math.PI * 2);
-                this.ctx.fill();
-                this.ctx.shadowBlur = 0;
-            }
-
-            // --- 8. 10 EMOJI PACK FACADE SWITCHER ---
-            render10EmojiPack() {
-                const w = this.width;
-                const h = this.height;
-                const cx = w * 0.5;
-                const cy = h * 0.5;
-
-                // Base Yellow Skin Tone Gradient (Dynamic according to emotion)
-                let baseColor1 = '#ffe600';
-                let baseColor2 = '#d48800';
-
-                if (this.activeEmoji === 'angry') {
-                    baseColor1 = '#ff4d4f';
-                    baseColor2 = '#9e1000';
-                } else if (this.activeEmoji === 'sleepy') {
-                    baseColor1 = '#adc6ff';
-                    baseColor2 = '#2f54eb';
-                }
-
-                const bgGrad = this.ctx.createRadialGradient(cx, cy, 100, cx, cy, h);
-                bgGrad.addColorStop(0, baseColor1);
-                bgGrad.addColorStop(1, baseColor2);
-                this.ctx.fillStyle = bgGrad;
-                this.ctx.fillRect(0, 0, w, h);
-
-                this.ctx.fillStyle = '#222222';
-                this.ctx.strokeStyle = '#222222';
-
-                switch (this.activeEmoji) {
-                    // 1. Happy Smile 馃槉
-                    case 'happy':
-                        // Eyes
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx - 130, cy - 40, 35, 0, Math.PI * 2);
-                        this.ctx.arc(cx + 130, cy - 40, 35, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        // Smile
-                        this.ctx.lineWidth = 14;
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx, cy + 20, 110, 0.1 * Math.PI, 0.9 * Math.PI);
-                        this.ctx.stroke();
-                        // Cheeks
-                        this.ctx.fillStyle = 'rgba(255, 77, 79, 0.4)';
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx - 170, cy + 30, 30, 0, Math.PI * 2);
-                        this.ctx.arc(cx + 170, cy + 30, 30, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        break;
-
-                    // 2. Cool Sunglasses 馃槑
-                    case 'cool':
-                        // Black Glasses Frame
-                        this.ctx.fillStyle = '#111111';
-                        this.ctx.beginPath();
-                        this.ctx.roundRect(cx - 210, cy - 90, 180, 95, 20);
-                        this.ctx.roundRect(cx + 30, cy - 90, 180, 95, 20);
-                        this.ctx.fill();
-                        this.ctx.fillRect(cx - 30, cy - 60, 60, 15);
-                        // Glass White Reflection Line
-                        this.ctx.strokeStyle = '#ffffff';
-                        this.ctx.lineWidth = 6;
-                        this.ctx.beginPath();
-                        this.ctx.moveTo(cx - 190, cy - 70);
-                        this.ctx.lineTo(cx - 120, cy - 20);
-                        this.ctx.moveTo(cx + 50, cy - 70);
-                        this.ctx.lineTo(cx + 120, cy - 20);
-                        this.ctx.stroke();
-                        // Cool Smirk
-                        this.ctx.lineWidth = 12;
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx + 20, cy + 30, 100, 0.1 * Math.PI, 0.6 * Math.PI);
-                        this.ctx.stroke();
-                        break;
-
-                    // 3. Winking Tongue 馃槣
-                    case 'wink':
-                        // Left Open Eye
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx - 130, cy - 50, 35, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        // Right Winking Eye (Arc)
-                        this.ctx.lineWidth = 14;
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx + 130, cy - 50, 35, 0.8 * Math.PI, 0.2 * Math.PI);
-                        this.ctx.stroke();
-                        // Mouth + Sticking Tongue
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx, cy + 30, 120, 0, Math.PI, false);
-                        this.ctx.fill();
-                        // Tongue Out
-                        this.ctx.fillStyle = '#ff4d4f';
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx - 30, cy + 130, 45, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        break;
-
-                    // 4. Heart Eyes 馃槏
-                    case 'heart_eyes':
-                        const pulse = Math.sin(this.time * 6) * 10 + 55;
-                        this.drawHeart(cx - 130, cy - 50, pulse, '#ff0054', true);
-                        this.drawHeart(cx + 130, cy - 50, pulse, '#ff0054', true);
-                        // Smile
-                        this.ctx.lineWidth = 14;
-                        this.ctx.fillStyle = '#222';
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx, cy + 30, 110, 0, Math.PI);
-                        this.ctx.fill();
-                        break;
-
-                    // 5. Crying Laughing 馃槶
-                    case 'cry_laugh':
-                        // Squint Eyes
-                        this.ctx.lineWidth = 14;
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx - 130, cy - 50, 35, 0.8 * Math.PI, 0.2 * Math.PI);
-                        this.ctx.arc(cx + 130, cy - 50, 35, 0.8 * Math.PI, 0.2 * Math.PI);
-                        this.ctx.stroke();
-                        // Big Open Laughing Mouth
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx, cy + 20, 120, 0, Math.PI);
-                        this.ctx.fill();
-                        // Blue Tear Streams
-                        this.ctx.fillStyle = '#00f0ff';
-                        this.ctx.shadowColor = '#00f0ff';
-                        this.ctx.shadowBlur = 15;
-                        const tearY = (this.time * 200) % 150 + cy - 30;
-                        this.ctx.beginPath();
-                        this.ctx.ellipse(cx - 200, tearY, 20, 35, -0.2, 0, Math.PI * 2);
-                        this.ctx.ellipse(cx + 200, tearY, 20, 35, 0.2, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        this.ctx.shadowBlur = 0;
-                        break;
-
-                    // 6. Thinking 馃
-                    case 'thinking':
-                        // Eyes looking up-right
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx - 110, cy - 60, 35, 0, Math.PI * 2);
-                        this.ctx.arc(cx + 130, cy - 60, 35, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        // Pupils looking up
-                        this.ctx.fillStyle = '#fff';
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx - 100, cy - 75, 12, 0, Math.PI * 2);
-                        this.ctx.arc(cx + 140, cy - 75, 12, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        // Puzzled mouth line
-                        this.ctx.lineWidth = 12;
-                        this.ctx.beginPath();
-                        this.ctx.moveTo(cx - 60, cy + 80);
-                        this.ctx.lineTo(cx + 60, cy + 60);
-                        this.ctx.stroke();
-                        // Thinking Hand Under Chin
-                        this.ctx.fillStyle = '#ffb700';
-                        this.ctx.beginPath();
-                        this.ctx.ellipse(cx - 40, cy + 130, 40, 25, -0.2, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        break;
-
-                    // 7. Shocked / O-Face 馃槷
-                    case 'shocked':
-                        // Wide Open Round Eyes
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx - 130, cy - 60, 45, 0, Math.PI * 2);
-                        this.ctx.arc(cx + 130, cy - 60, 45, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        // Big 'O' Mouth
-                        this.ctx.beginPath();
-                        this.ctx.ellipse(cx, cy + 70, 50, 75, 0, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        break;
-
-                    // 8. Angry / Furious 馃槨
-                    case 'angry':
-                        // Angry Slanted Eyebrows
-                        this.ctx.lineWidth = 18;
-                        this.ctx.beginPath();
-                        this.ctx.moveTo(cx - 200, cy - 120);
-                        this.ctx.lineTo(cx - 70, cy - 60);
-                        this.ctx.moveTo(cx + 200, cy - 120);
-                        this.ctx.lineTo(cx + 70, cy - 60);
-                        this.ctx.stroke();
-                        // Glaring Eyes
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx - 120, cy - 40, 30, 0, Math.PI * 2);
-                        this.ctx.arc(cx + 120, cy - 40, 30, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        // Frown Mouth
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx, cy + 120, 100, 1.1 * Math.PI, 1.9 * Math.PI);
-                        this.ctx.stroke();
-                        break;
-
-                    // 9. Sleeping 馃槾
-                    case 'sleepy':
-                        // Closed Curved Eyes (Sleeping)
-                        this.ctx.lineWidth = 12;
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx - 130, cy - 30, 40, 0.1 * Math.PI, 0.9 * Math.PI);
-                        this.ctx.arc(cx + 130, cy - 30, 40, 0.1 * Math.PI, 0.9 * Math.PI);
-                        this.ctx.stroke();
-                        // Small Round Snoring Mouth
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx, cy + 60, 30, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        // Floating 'Zzz' Text
-                        this.ctx.font = '900 48px Orbitron, sans-serif';
-                        this.ctx.fillStyle = '#ffffff';
-                        const zY = (this.time * 60) % 120;
-                        this.ctx.fillText("Z Z z", cx + 180, cy - 80 - zY);
-                        break;
-
-                    // 10. Mind Blown 馃く
-                    case 'mindblown':
-                        // Eyes wide bulging
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx - 130, cy - 10, 40, 0, Math.PI * 2);
-                        this.ctx.arc(cx + 130, cy - 10, 40, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        // Open Shocked Mouth
-                        this.ctx.beginPath();
-                        this.ctx.ellipse(cx, cy + 100, 60, 40, 0, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        // Top Head Explosion Mushroom Cloud
-                        for (let i = 0; i < 20; i++) {
-                            const expAngle = (Math.PI / 20) * i + Math.PI;
-                            const expDist = 180 + Math.sin(this.time * 8 + i) * 30;
-                            const px = cx + Math.cos(expAngle) * expDist;
-                            const py = cy - 60 + Math.sin(expAngle) * expDist;
+                        <!-- Main Primary Hero Action Buttons Emphasis on WeChat & Phone -->
+                        <div class="pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                            <!-- WeChat Consultation Hero Button -->
+                            <button onclick="copyWeChat('13802694295')" class="pulse-subtle w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-brand-wechat hover:bg-brand-wechatHover text-white font-extrabold px-7 py-4 rounded-xl shadow-lg hover:shadow-emerald-500/30 transition-all text-base">
+                                <i class="fa-brands fa-weixin text-2xl"></i>
+                                <span data-i18n="heroBtnWeChat">微信咨询: 13802694295</span>
+                            </button>
                             
-                            this.ctx.fillStyle = ['#ff0055', '#00f0ff', '#ffea00'][i % 3];
-                            this.ctx.shadowColor = '#ffea00';
-                            this.ctx.shadowBlur = 15;
-                            this.ctx.beginPath();
-                            this.ctx.arc(px, py, 25, 0, Math.PI * 2);
-                            this.ctx.fill();
-                        }
-                        this.ctx.shadowBlur = 0;
-                        break;
-                }
-            }
+                            <!-- Phone Call Hero Button -->
+                            <a href="tel:+8613802694295" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold px-7 py-4 rounded-xl transition-all text-base backdrop-blur">
+                                <i class="fa-solid fa-phone-volume text-brand-cyan text-xl"></i>
+                                <span data-i18n="heroBtnPhone">电话直连: +86 138 0269 4295</span>
+                            </a>
+                        </div>
+                    </div>
 
-            // 9. Realistic Earth
-            renderEarth() {
-                const w = this.width;
-                const h = this.height;
+                    <!-- Right Hero Direct Contact Card -->
+                    <div class="lg:col-span-5">
+                        <div class="bg-white text-slate-800 p-6 sm:p-8 rounded-2xl shadow-2xl border border-slate-100 relative space-y-6">
+                            <div class="absolute -top-3 -right-3 bg-brand-orange text-white text-xs font-extrabold uppercase px-3 py-1 rounded-full shadow">
+                                Direct Factory Supply
+                            </div>
+                            
+                            <h3 class="text-xl font-bold text-brand-navy flex items-center gap-2">
+                                <i class="fa-solid fa-headset text-brand-teal"></i>
+                                <span data-i18n="directContactTitle">官方微信与电话快速通道</span>
+                            </h3>
 
-                this.ctx.fillStyle = '#04152d';
-                this.ctx.fillRect(0, 0, w, h);
+                            <p class="text-sm text-slate-600 leading-relaxed" data-i18n="directContactDesc">
+                                欢迎随时通过微信或电话与我们位于中山小榄的生产团队沟通，获取即时报价与样品寄送服务。
+                            </p>
 
-                const offset = (this.time * 30) % w;
-                this.ctx.fillStyle = '#1b4d2e';
+                            <!-- Interactive Quick Contact Buttons -->
+                            <div class="space-y-3.5 pt-1">
+                                <!-- WeChat Box -->
+                                <div onclick="copyWeChat('13802694295')" class="group cursor-pointer flex items-center justify-between p-3.5 bg-emerald-50/70 hover:bg-emerald-100/80 rounded-xl border border-emerald-200 transition-all">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-11 h-11 rounded-lg bg-brand-wechat text-white flex items-center justify-center text-2xl shrink-0 shadow-sm">
+                                            <i class="fa-brands fa-weixin"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-semibold text-emerald-800 uppercase" data-i18n="wechatLabel">微信咨询号 (点击复制)</div>
+                                            <div class="text-lg font-extrabold text-slate-900 group-hover:text-emerald-700">13802694295</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-bold text-emerald-700 bg-white px-2.5 py-1 rounded-md border border-emerald-300 shadow-sm" data-i18n="copyBtnText">点击复制</span>
+                                </div>
 
-                for (let i = -1; i <= 2; i++) {
-                    const baseX = i * w + offset;
+                                <!-- Phone Box -->
+                                <a href="tel:+8613802694295" class="group flex items-center justify-between p-3.5 bg-blue-50/70 hover:bg-blue-100/80 rounded-xl border border-blue-200 transition-all">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-11 h-11 rounded-lg bg-brand-navy text-white flex items-center justify-center text-2xl shrink-0 shadow-sm">
+                                            <i class="fa-solid fa-phone"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-semibold text-blue-800 uppercase" data-i18n="phoneLabel">24小时电话热线 (点击拨打)</div>
+                                            <div class="text-lg font-extrabold text-slate-900 group-hover:text-brand-navy">+86 138 0269 4295</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-bold text-brand-navy bg-white px-2.5 py-1 rounded-md border border-blue-300 shadow-sm" data-i18n="callBtnText">拨打电话</span>
+                                </a>
+                            </div>
 
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(baseX + 100, 100);
-                    this.ctx.quadraticCurveTo(baseX + 250, 120, baseX + 280, 250);
-                    this.ctx.quadraticCurveTo(baseX + 200, 320, baseX + 120, 260);
-                    this.ctx.closePath();
-                    this.ctx.fill();
+                            <a href="#contact" class="w-full bg-slate-900 hover:bg-brand-navy text-white font-bold py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-xs">
+                                <i class="fa-solid fa-location-dot text-brand-cyan"></i>
+                                <span data-i18n="viewContactBtn">查看详细工厂地址与联系说明</span>
+                            </a>
+                        </div>
+                    </div>
 
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(baseX + 500, 120);
-                    this.ctx.quadraticCurveTo(baseX + 750, 100, baseX + 850, 240);
-                    this.ctx.quadraticCurveTo(baseX + 650, 340, baseX + 520, 260);
-                    this.ctx.closePath();
-                    this.ctx.fill();
-                }
+                </div>
+            </div>
+        </section>
 
-                this.ctx.fillStyle = '#ffc107';
-                for (let j = 0; j < 80; j++) {
-                    const lx = ((j * 47) + offset) % w;
-                    const ly = 120 + Math.sin(j * 3) * 140;
-                    this.ctx.fillRect(lx, ly, 3, 3);
-                }
+        <!-- Trust Features Bar -->
+        <section class="bg-white py-8 border-b border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                    <div class="space-y-1">
+                        <div class="text-brand-teal font-extrabold text-2xl">100%</div>
+                        <div class="text-xs text-slate-600 font-semibold uppercase tracking-wider" data-i18n="stat1">Virgin Material Quality</div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="text-brand-navy font-extrabold text-2xl">3,000+</div>
+                        <div class="text-xs text-slate-600 font-semibold uppercase tracking-wider" data-i18n="stat2">Low Custom MOQ</div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="text-brand-cyan font-extrabold text-2xl">0 - 5%</div>
+                        <div class="text-xs text-slate-600 font-semibold uppercase tracking-wider" data-i18n="stat3">ASEAN Form E Tariff</div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="text-brand-orange font-extrabold text-2xl">7-10 Days</div>
+                        <div class="text-xs text-slate-600 font-semibold uppercase tracking-wider" data-i18n="stat4">Fast Lead Time</div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
-                for (let c = -1; c <= 2; c++) {
-                    const cx = c * w + offset * 1.3;
-                    this.ctx.beginPath();
-                    this.ctx.ellipse(cx + 300, 180, 160, 25, 0.2, 0, Math.PI * 2);
-                    this.ctx.ellipse(cx + 700, 320, 200, 30, -0.1, 0, Math.PI * 2);
-                    this.ctx.fill();
-                }
-            }
+        <!-- Products Section -->
+        <section id="products" class="py-16 lg:py-24 bg-slate-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Section Title -->
+                <div class="text-center max-w-3xl mx-auto mb-12">
+                    <h2 class="text-xs font-extrabold uppercase tracking-widest text-brand-teal mb-2" data-i18n="prodSubTitle">Full Spectrum Packaging Supplies</h2>
+                    <p class="text-3xl font-extrabold text-brand-navy sm:text-4xl" data-i18n="prodMainTitle">工业包装与定制胶袋系列</p>
+                    <p class="text-slate-600 mt-3 text-sm sm:text-base" data-i18n="prodDesc">高透明度、强拉伸力、高承重力，完全支持根据品牌需求定制尺寸、厚度及 Logo 印刷。</p>
+                </div>
 
-            // 10. Custom User Configured Facade Engine
-            renderCustom() {
-                const w = this.width;
-                const h = this.height;
+                <!-- Product Cards Grid with High Quality Real Product Photos -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
-                this.ctx.fillStyle = '#050714';
-                this.ctx.fillRect(0, 0, w, h);
+                    <!-- Product 1: Stretch Film -->
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between group">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                                <img src="https://images.openai.com/static-rsc-4/1i1PN45mHXrR9w_2LA7tM0hBjwyClSTzr6N70dJ08fRXVKsHfOzAV5rEOaxVof_dpw85AvfJyVeMxWY23AN6EXwXYCOh0cVaug_rhJhQ9i-4WrVPrEBOkw-ALMhR4uj4eOSVJt5vzj6fZOv4nsmGPwIZ85xAMXY22ZVCGPCzkP7EDJoCCdvURQI71Jg2FMLk?purpose=fullsize" class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"><img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80" 
+                                     alt="LLDPE Industrial Stretch Film Roll Wrap" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/0f3460/ffffff?text=Stretch+Film';" />
+                                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    100% Virgin LLDPE
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p1Title">Stretch Film (拉伸膜)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p1Desc">Hand & machine grade LLDPE stretch film. High puncture resistance, superior stretchability, and strong self-adhesion for pallet wrapping and cargo protection.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p1Spec1">Thickness: 15 - 50 Micron</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p1Spec2">Color: Clear, Black, Blue</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信询价</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话咨询</span>
+                            </a>
+                        </div>
+                    </div>
 
-                const c1 = this.params.color1;
-                const c2 = this.params.color2;
+                    <!-- Product 2: Strapping Band -->
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between group">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                               <img src="https://images.openai.com/static-rsc-4/-vk_rcTnkVlwXy5WCi4TYWzzvp79DJAQLu5J8ucnZPYFpFVN6780_EM3Hnj6T-D70Fw74EcQR_mB4Wt_2XZjqZMxoPTmJDLZoFkLatSYoIKEgY0wjraOclmxjEGh2QrA9E9Xvof7CAIKiJWsUk_9_auynbKCKG19kr-wg9l7sYC46fsQ8_AYanuzRGH3cqwL?purpose=fullsize" alt="Strapping Band Rolls"> <img src="https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?auto=format&fit=crop&w=800&q=80" 
+                                     alt="PET PP Strapping Band Belts" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/2a9d8f/ffffff?text=Strapping+Band';" />
+                                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    Heavy Duty PET / PP
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p2Title">Strapping Band (打包带)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p2Desc">Heavy-duty PET & PP strapping belts for bundling cartons, timber, and heavy machinery. Compatible with automatic and manual strapping tools.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p2Spec1">Material: High Tensile PP / PET</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p2Spec2">Custom Widths & Colors</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信询价</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话咨询</span>
+                            </a>
+                        </div>
+                    </div>
 
-                if (this.params.mode === 'matrix') {
-                    const cols = 32;
-                    const cellW = w / cols;
-                    for (let x = 0; x < cols; x++) {
-                        for (let y = 0; y < 16; y++) {
-                            const val = Math.sin(x * 0.5 + y * 0.5 + this.time * 3);
-                            this.ctx.fillStyle = val > 0 ? c1 : c2;
-                            this.ctx.fillRect(x * cellW + 2, y * 32 + 2, cellW - 4, 28);
-                        }
-                    }
-                } else if (this.params.mode === 'waves') {
-                    for (let x = 0; x < w; x += 10) {
-                        const waveY = h/2 + Math.sin(x * 0.01 + this.time * 3) * 100 + Math.cos(x * 0.02 - this.time * 2) * 50;
-                        const grad = this.ctx.createLinearGradient(x, 0, x, h);
-                        grad.addColorStop(0, c1);
-                        grad.addColorStop(1, c2);
-                        this.ctx.fillStyle = grad;
-                        this.ctx.fillRect(x, waveY - 20, 8, 40);
-                    }
-                } else if (this.params.mode === 'text') {
-                    this.ctx.font = '900 52px Orbitron, sans-serif';
-                    this.ctx.textAlign = 'center';
-                    this.ctx.fillStyle = c1;
-                    this.ctx.shadowColor = c2;
-                    this.ctx.shadowBlur = 25;
+                    <!-- Product 3: EPE Pearl Cotton -->
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between group">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                                <img src="https://images.openai.com/static-rsc-4/CmiULZVGhHeQUmJPMEo2XxgH2L7pVN_71vJCNLqMG0jo9jBZr7BhBAr1I-4zSK6jfsMBrVKBwALtiNqrtxL3lz9ABy0A-vT9YSg2ErYcxBmd3XbrTIuGPHYSvsjP_lZ766smsdpGT5nGixxfmbIlZzAM3AsbrdGDey_96vGoL1v-UARt_oeUMaBIQDh-3cNo?purpose=fullsize" class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"><img src="https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=800&q=80" 
+                                     alt="EPE Pearl Cotton Cushion Foam Sheet" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/f77f00/ffffff?text=EPE+Foam';" />
+                                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    Shockproof Cushion
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p3Title">EPE Pearl Cotton Foam (珍珠棉)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p3Desc">Shockproof, anti-scratch EPE foam sheets, rolls, and bags. Essential protection for hardware, electronics, lighting fixtures, and fragile goods.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p3Spec1">Custom Thickness & Foam Die-cuts</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p3Spec2">Waterproof & Anti-Static Options</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信询价</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话咨询</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Product 4: Sealing Tape -->
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between group">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                                <img src="https://images.openai.com/static-rsc-4/5mVJVPqlwGg7J-m9BuPKDt3YDlTuu03DGvblQ1XIuKdAVxAtEoHpSFfeiDttMXA0d4Xk-bYWtHdf9BD9rlSYehDWb5Iaq7WSQJdmXBzvkQNd7zox1j8XuYjMbT9P_iU-MFnfjjgIED6NkH3VQCpI9ojHVtWvt0yRj9ozPZU4rkeuydngMqOLmEM7dHqJHuiY?purpose=fullsize" alt="Sealing BOPP Tapes" ><img src="https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=800&q=80" 
+                                     alt="BOPP Carton Sealing Tape Rolls" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/00b4d8/ffffff?text=Sealing+Tape';" />
+                                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    High Adhesion BOPP
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p4Title">Sealing Tape / BOPP Tape (封箱胶)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p4Desc">Strong acrylic adhesive BOPP carton sealing tape. Available in clear, tan, fragile warning print, and customized brand logo printing.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p4Spec1">Strong Adhesion & Weatherproof</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p4Spec2">Custom Brand Logo Printing</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信询价</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话咨询</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Product 5: Bubble Mailers & Bags -->
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between group">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                                <img src="https://images.openai.com/static-rsc-4/oPG_WBo8s_vGpCT4TxmpiLPvFu3fVCV7JXHhOC66CqsWu0KSIijW4qgyxZv7EATJBCRe4o1LkG1oYxk9YfLWpCmD08F16MhPqs-avryQNW-49DHx_583T-f8PduVRL2n3lhI8rEJvOKwrC6ek4ph1hk7SnQN1xEr9cxvVlpVe9YCzr_aoLmNh7RJUlD9EYO2?purpose=fullsize" alt="Bubble Mailers and Pouches" ><img src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?auto=format&fit=crop&w=800&q=80" 
+                                     alt="Bubble Padded Shipping Mailer Envelopes" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/6366f1/ffffff?text=Bubble+Mailers';" />
+                                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    Padded Protective Envelope
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p5Title">Bubble Mailers & Bags (气泡袋)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p5Desc">Protective bubble wrap pouches and metallic/poly bubble mailers with self-adhesive destructive glue. Ideal for e-commerce, cosmetics, and electronics shipping.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p5Spec1">Tamper-Evident Strong Adhesive</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p5Spec2">Shockproof Air Bubble Cushioning</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信询价</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话咨询</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Product 6: PE Poly Bags -->
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between group">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                               <img src="https://images.openai.com/static-rsc-4/66z7j87HzsUL3QQeboSvWXjhiv7jTQT4DSc7o71JItcCS7Qz6KhwoxDHlltO09xMx7Wo-oUDQZaOXLGY8-hn-hzhMepUEywLEaw6xHxwMFS4M09INoZ1XRiK1dBt3afX-IQwps37mPvDj8EQ4lJKFiqGaUwBoc7nYvc-J9aa3_M_FpMLc5_sJ5pDVElu8Nai?purpose=fullsize" alt="Clear PE Poly Bags" > <img src="https://images.unsplash.com/photo-1595246140625-573b715d11dc?auto=format&fit=crop&w=800&q=80" 
+                                     alt="High Clarity LDPE Poly Bags and Ziplock Bags" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/059669/ffffff?text=PE+Poly+Bags';" />
+                                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    High Clarity LDPE
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p6Title">PE Poly Bags (PE 胶袋)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p6Desc">High clarity LDPE / HDPE flat poly bags, ziplock bags, and hole-punched garment bags. Non-toxic, virgin material for industrial parts and everyday packaging.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p6Spec1">Tough Sealing & Anti-Bursting</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p6Spec2">Air-hole Ventilation Punching</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信询价</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话咨询</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Product 7: PO Poly Bags -->
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between group">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                               <img src="https://images.openai.com/static-rsc-4/HSeHqgD2VKQ7fAFd1z7ntW8fF4ULQk5GAHsQzEs1LFvYH1emp2nhItAn5-4pCGn-Rqfmi7bkFGIiLJ3BraoHFyLwhQ9fZocn-Wi5S9QjqBzgI1lXhcsKEF1JNuh23fQzAz7-UUgxZH_B2d_s2_LThI_z6ICqA7qefhmaWJe7grMna2sAKniqfqe3--bapAqS?purpose=fullsize" > <img src="https://images.unsplash.com/photo-1572981779307-38b8cabb2407?auto=format&fit=crop&w=800&q=80" 
+                                     alt="High Strength PO HDPE Garment and Retail Poly Bags" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/9333ea/ffffff?text=PO+Poly+Bags';" />
+                                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    High Tensile PO / HDPE
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p7Title">PO Poly Bags (PO 胶袋)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p7Desc">High tensile strength PO (HDPE blend) bags with a crisp, matte feel. Economical choice for apparel, retail t-shirt bags, and industrial inner liners.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p7Spec1">High Stiffness & Load Capacity</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p7Spec2">Cost-Effective Bulk Packaging</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信询价</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话咨询</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Product 8: CPE Frosted Zipper Bags -->
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm card-hover flex flex-col justify-between group">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                               <img src="https://images.openai.com/static-rsc-4/v1qyvWj0ZzZYgHnQj9W4PxwtDFBaVaaXA2I6aAqNtLkxPINcADGaF7eqWfO8oeyZj1l0yD0WdkWrUhtIdG44pVZro2UEFH_z62MtxhdUAsR4ZGf1qXeYxi5bqfCLD1GZ-ryuJox8Diik2Mhwg-FucsEjWxAbJvcu16O9XDgf4NsyVdneEFASkgYvdUuTjo5d?purpose=fullsize" alt="Frosted Zipper Apparel Bags" > <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=800&q=80" 
+                                     alt="Premium CPE Frosted Translucent Apparel Zipper Bags" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/e11d48/ffffff?text=CPE+Frosted+Bags';" />
+                                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    Silky Frosted CPE
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p8Title">CPE Frosted Zipper Bags (CPE 磨砂拉链袋)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p8Desc">Premium silky-soft frosted finish zipper pouches. Highly popular for global fashion brands, swimwear, footwear, and luxury apparel packaging.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p8Spec1">Elegant Soft Touch & Anti-Scratch</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p8Spec2">Custom Brand Logo & Vent Hole</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信询价</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话咨询</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Product 9: Custom Printed Poly Bags -->
+                    <div class="bg-white rounded-2xl border-2 border-brand-teal/40 overflow-hidden shadow-md card-hover flex flex-col justify-between group relative">
+                        <div>
+                            <!-- Product Photo Container -->
+                            <div class="relative w-full h-52 bg-slate-100 overflow-hidden">
+                               <img src="https://images.openai.com/static-rsc-4/WyRGv4abk30JnTgn9e-OBIZMga8fmdZKV3xo_taoqnp144tLBFBuKUlRi18Yd4eA9-Tqns8oyUS_-ie3rJusiYHaBgZ1Od3l5gHMbZ_NAif11XsjJOTYyPaKadj1Ua23LBty4J4LtsaZlp_pVfWzQ7ZAG-6zmi4fVFH_N0JDN2821B9KMDRlL5e6HCDupR75?purpose=fullsize" alt="Custom Logo Printed Poly Bags" class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"> <img src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80" 
+                                     alt="Custom Printed Branding Poly Plastic Packaging Bags" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/800x520/2a9d8f/ffffff?text=Custom+Printed+Bags';" />
+                                <div class="absolute top-3 left-3 bg-brand-teal text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow">
+                                    Featured OEM / ODM
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-brand-navy mb-2" data-i18n="p9Title">Custom Printed Poly Bags (定制各种胶袋)</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mb-4" data-i18n="p9Desc">Fully customized sizes, colors, thickness, handle cutouts, and multi-color logo printing. Biodegradable (PLA/PBAT) options available upon request.</p>
+                                <ul class="text-xs text-slate-500 space-y-1.5 border-t border-slate-100 pt-3">
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p9Spec1">Low MOQ Starts from 3,000 Pcs</span></li>
+                                    <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> <span data-i18n="p9Spec2">Free Artwork Proof & Design Guidance</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-emerald-50/80 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <button onclick="copyWeChat('13802694295')" class="flex-1 text-center py-2 bg-brand-wechat hover:bg-brand-wechatHover text-white text-xs font-bold rounded-lg transition-colors shadow">
+                                <i class="fa-brands fa-weixin mr-1"></i> <span data-i18n="prodInquireWeChat">微信定制咨询</span>
+                            </button>
+                            <a href="tel:+8613802694295" class="flex-1 text-center py-2 bg-slate-900 hover:bg-brand-navy text-white text-xs font-bold rounded-lg transition-colors shadow">
+                                <i class="fa-solid fa-phone mr-1"></i> <span data-i18n="prodInquirePhone">电话定制咨询</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Advantages Section -->
+        <section id="advantages" class="py-16 lg:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-xs font-extrabold uppercase tracking-widest text-brand-teal mb-2" data-i18n="advSubTitle">Why Global Traders Choose ShunXiang</h2>
+                    <p class="text-3xl font-extrabold text-brand-navy sm:text-4xl" data-i18n="advMainTitle">Tailored For Export & Low-Barrier Import</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                     
-                    const scrollX = w * 0.5 + Math.sin(this.time * 2) * 150;
-                    this.ctx.fillText(this.params.text.toUpperCase(), scrollX, h * 0.55);
-                    this.ctx.shadowBlur = 0;
-                } else if (this.params.mode === 'rings') {
-                    const cx = w * 0.5;
-                    const cy = h * 0.5;
-                    for (let r = 20; r < 300; r += 40) {
-                        const radius = (r + this.time * 80) % 300;
-                        this.ctx.strokeStyle = r % 80 === 0 ? c1 : c2;
-                        this.ctx.lineWidth = 12;
-                        this.ctx.beginPath();
-                        this.ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-                        this.ctx.stroke();
-                    }
-                }
-            }
-        }
+                    <!-- Advantage 1 -->
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200/80 space-y-3">
+                        <div class="w-12 h-12 rounded-xl bg-brand-navy text-white flex items-center justify-center text-xl shadow">
+                            <i class="fa-solid fa-cubes"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-brand-navy" data-i18n="adv1Title">Low MOQ Customization</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed" data-i18n="adv1Desc">Custom logo printing starts from only 3,000 pieces. Perfect for growing e-commerce brands and boutique importers.</p>
+                    </div>
 
-        // --- 3. Three.js 3D Sphere Scene ---
-        class VegasSphereScene {
-            constructor() {
-                this.container = document.getElementById('webgl-container');
-                this.facadeGen = new FacadeTextureGenerator('texture-canvas');
+                    <!-- Advantage 2 -->
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200/80 space-y-3">
+                        <div class="w-12 h-12 rounded-xl bg-brand-teal text-white flex items-center justify-center text-xl shadow">
+                            <i class="fa-solid fa-passport"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-brand-navy" data-i18n="adv2Title">Form E & RCEP Duty-Free</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed" data-i18n="adv2Desc">We provide official ASEAN Form E and RCEP certificates of origin, helping you enjoy 0% - 5% tariff reduction.</p>
+                    </div>
 
-                this.scene = new THREE.Scene();
-                this.scene.fog = new THREE.FogExp2(0x030308, 0.0035);
+                    <!-- Advantage 3 -->
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200/80 space-y-3">
+                        <div class="w-12 h-12 rounded-xl bg-brand-cyan text-white flex items-center justify-center text-xl shadow">
+                            <i class="fa-solid fa-truck-ramp-box"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-brand-navy" data-i18n="adv3Title">DDP Door-to-Door Logistics</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed" data-i18n="adv3Desc">Stress-free DDP shipping to Vietnam, Thailand, Indonesia, Malaysia, and Middle East with full customs clearance.</p>
+                    </div>
 
-                this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-                this.camera.position.set(0, 18, 65);
+                    <!-- Advantage 4 -->
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200/80 space-y-3">
+                        <div class="w-12 h-12 rounded-xl bg-brand-orange text-white flex items-center justify-center text-xl shadow">
+                            <i class="fa-solid fa-industry"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-brand-navy" data-i18n="adv4Title">Xiaolan Supply Chain</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed" data-i18n="adv4Desc">Direct access to Zhongshan Xiaolan's robust raw material and blown-film manufacturing network for competitive pricing.</p>
+                    </div>
 
-                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
-                this.renderer.setSize(window.innerWidth, window.innerHeight);
-                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-                this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-                this.renderer.toneMappingExposure = 1.2;
-                this.renderer.shadowMap.enabled = true;
-                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                </div>
+            </div>
+        </section>
 
-                this.container.appendChild(this.renderer.domElement);
+        <!-- About Us Section -->
+        <section id="about" class="py-16 lg:py-20 bg-slate-900 text-white relative overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-12 gap-12 items-center">
+                    
+                    <div class="lg:col-span-6 space-y-5">
+                        <div class="text-brand-cyan font-bold text-xs uppercase tracking-widest" data-i18n="aboutTag">About ShunXiang Packaging</div>
+                        <h2 class="text-3xl font-extrabold text-white sm:text-4xl leading-tight" data-i18n="aboutTitle">
+                            Your Reliable Flexible Packaging Partner in Xiaolan
+                        </h2>
+                        <p class="text-slate-300 text-sm sm:text-base leading-relaxed" data-i18n="aboutP1">
+                            ShunXiang Packaging (顺祥胶袋包装) operates with an agile "Trading & Direct Supply Chain" model. Rooted in Xiaolan Town, Zhongshan City, Guangdong Province—a world-class manufacturing hub—we specialize in exporting industrial packaging and custom poly bags.
+                        </p>
+                        <p class="text-slate-300 text-sm sm:text-base leading-relaxed" data-i18n="aboutP2">
+                            Unlike traditional rigid factories, we prioritize flexibility: low MOQs, rapid sample delivery, multi-lingual client support via WeChat, and end-to-end international shipping assistance.
+                        </p>
 
-                this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-                this.controls.enableDamping = true;
-                this.controls.dampingFactor = 0.05;
-                this.controls.maxPolarAngle = Math.PI / 2 - 0.01;
-                this.controls.minDistance = 25;
-                this.controls.maxDistance = 150;
-                this.controls.autoRotate = true;
-                this.controls.autoRotateSpeed = 0.8;
+                        <div class="pt-2 flex flex-wrap gap-4 text-xs font-semibold text-slate-300">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-brand-teal"></i> 100% Virgin LDPE/HDPE</span>
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-brand-teal"></i> Strict QC Inspection</span>
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-brand-teal"></i> Direct & Fast Communication</span>
+                        </div>
+                    </div>
 
-                this.clock = new THREE.Clock();
+                    <div class="lg:col-span-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white/5 border border-white/10 p-6 rounded-2xl text-center space-y-2">
+                                <i class="fa-solid fa-earth-americas text-3xl text-brand-cyan"></i>
+                                <div class="text-white font-bold text-base" data-i18n="aboutStat1Title">Global Focus</div>
+                                <div class="text-xs text-slate-400" data-i18n="aboutStat1Desc">SE Asia, Middle East, Europe & Americas</div>
+                            </div>
+                            <div class="bg-white/5 border border-white/10 p-6 rounded-2xl text-center space-y-2">
+                                <i class="fa-solid fa-bolt text-3xl text-amber-400"></i>
+                                <div class="text-white font-bold text-base" data-i18n="aboutStat2Title">Quick Turnaround</div>
+                                <div class="text-xs text-slate-400" data-i18n="aboutStat2Desc">3-5 Days Sample, 7-10 Days Bulk</div>
+                            </div>
+                            <div class="bg-white/5 border border-white/10 p-6 rounded-2xl text-center space-y-2">
+                                <i class="fa-solid fa-handshake text-3xl text-emerald-400"></i>
+                                <div class="text-white font-bold text-base" data-i18n="aboutStat3Title">Agile Partner</div>
+                                <div class="text-xs text-slate-400" data-i18n="aboutStat3Desc">Small Orders & OEM Customized</div>
+                            </div>
+                            <div class="bg-white/5 border border-white/10 p-6 rounded-2xl text-center space-y-2">
+                                <i class="fa-solid fa-file-invoice text-3xl text-brand-orange"></i>
+                                <div class="text-white font-bold text-base" data-i18n="aboutStat4Title">Duty Free Docs</div>
+                                <div class="text-xs text-slate-400" data-i18n="aboutStat4Desc">Form E, RCEP, Commercial Invoice</div>
+                            </div>
+                        </div>
+                    </div>
 
-                this.initLights();
-                this.initSphere();
-                this.initEnvironment();
-                this.bindEvents();
+                </div>
+            </div>
+        </section>
 
-                this.animate();
-            }
-
-            initLights() {
-                const ambientLight = new THREE.AmbientLight(0x0d111e, 1.2);
-                this.scene.add(ambientLight);
-
-                const dirLight = new THREE.DirectionalLight(0x223355, 1.5);
-                dirLight.position.set(50, 80, 40);
-                dirLight.castShadow = true;
-                dirLight.shadow.mapSize.width = 2048;
-                dirLight.shadow.mapSize.height = 2048;
-                this.scene.add(dirLight);
-
-                this.spherePointLight = new THREE.PointLight(0x00f0ff, 3.5, 120);
-                this.spherePointLight.position.set(0, 15, 0);
-                this.scene.add(this.spherePointLight);
-            }
-
-            initSphere() {
-                this.facadeTexture = new THREE.CanvasTexture(this.facadeGen.canvas);
-                this.facadeTexture.minFilter = THREE.LinearFilter;
-                this.facadeTexture.magFilter = THREE.LinearFilter;
-                this.facadeTexture.wrapS = THREE.RepeatWrapping;
-                this.facadeTexture.wrapT = THREE.ClampToEdgeWrapping;
-
-                const geometry = new THREE.SphereGeometry(18, 64, 64);
-
-                this.sphereMaterial = new THREE.MeshStandardMaterial({
-                    map: this.facadeTexture,
-                    emissiveMap: this.facadeTexture,
-                    emissive: new THREE.Color(0xffffff),
-                    emissiveIntensity: 1.5,
-                    roughness: 0.2,
-                    metalness: 0.8
-                });
-
-                this.sphereMesh = new THREE.Mesh(geometry, this.sphereMaterial);
-                this.sphereMesh.position.set(0, 15, 0);
-                this.sphereMesh.castShadow = true;
-                this.sphereMesh.receiveShadow = true;
-                this.scene.add(this.sphereMesh);
-
-                const glowGeo = new THREE.SphereGeometry(18.6, 32, 32);
-                const glowMat = new THREE.MeshBasicMaterial({
-                    color: 0x00f0ff,
-                    transparent: true,
-                    opacity: 0.12,
-                    side: THREE.BackSide
-                });
-                this.glowMesh = new THREE.Mesh(glowGeo, glowMat);
-                this.sphereMesh.add(this.glowMesh);
-            }
-
-            initEnvironment() {
-                const groundGeo = new THREE.PlaneGeometry(300, 300);
-                const groundMat = new THREE.MeshStandardMaterial({
-                    color: 0x0a0d14,
-                    roughness: 0.1,
-                    metalness: 0.6
-                });
-                const ground = new THREE.Mesh(groundGeo, groundMat);
-                ground.rotation.x = -Math.PI / 2;
-                ground.position.y = -3;
-                ground.receiveShadow = true;
-                this.scene.add(ground);
-
-                const grid = new THREE.GridHelper(300, 40, 0x06b6d4, 0x1e293b);
-                grid.position.y = -2.9;
-                this.scene.add(grid);
-
-                const buildingGroup = new THREE.Group();
-                const bldgGeo = new THREE.BoxGeometry(1, 1, 1);
+        <!-- Contact Section High Converting Dual Card Focus -->
+        <section id="contact" class="py-16 lg:py-24 bg-slate-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 
-                for (let i = 0; i < 45; i++) {
-                    const angle = (i / 45) * Math.PI * 2;
-                    const radius = 90 + Math.random() * 50;
+                <div class="text-center max-w-3xl mx-auto mb-12">
+                    <h2 class="text-xs font-extrabold uppercase tracking-widest text-brand-teal mb-2" data-i18n="contactSubTitle">Get In Touch</h2>
+                    <p class="text-3xl font-extrabold text-brand-navy sm:text-4xl" data-i18n="contactMainTitle">微信与电话优先对接通道</p>
+                    <p class="text-slate-600 mt-2 text-sm sm:text-base" data-i18n="contactDesc">承接国内外订单与大宗采购，建议优先使用微信或者直接拨打电话沟通交流！</p>
+                </div>
 
-                    const x = Math.cos(angle) * radius;
-                    const z = Math.sin(angle) * radius;
+                <!-- High Conversion Dual Cards (WeChat vs Phone) -->
+                <div class="grid lg:grid-cols-2 gap-8 mb-12">
+                    
+                    <!-- WeChat Dedicated Action Card -->
+                    <div class="bg-white p-8 rounded-3xl border-2 border-emerald-500/40 shadow-lg relative flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-extrabold">
+                                    <i class="fa-brands fa-weixin"></i> <span data-i18n="recContactTag">推荐联系方式</span>
+                                </div>
+                                <span class="text-xs font-bold text-slate-400" data-i18n="instantResponse">即时在线回复</span>
+                            </div>
+                            
+                            <h3 class="text-2xl font-extrabold text-slate-900" data-i18n="wechatCardTitle">微信沟通咨询 (WeChat Consultation)</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed" data-i18n="wechatCardDesc">
+                                添加工厂官方微信，快速发送样品图、规格式样、设计排版稿及批量采购报价。
+                            </p>
 
-                    const height = 20 + Math.random() * 65;
-                    const width = 12 + Math.random() * 16;
-                    const depth = 12 + Math.random() * 16;
+                            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between">
+                                <div>
+                                    <div class="text-xs font-bold text-slate-500 uppercase" data-i18n="wechatIdLabel">微信号 / WeChat ID</div>
+                                    <div class="text-2xl font-black text-emerald-600 tracking-wide">13802694295</div>
+                                </div>
+                                <button onclick="copyWeChat('13802694295')" class="bg-brand-wechat hover:bg-brand-wechatHover text-white px-5 py-3 rounded-xl font-bold text-xs shadow transition-all flex items-center gap-2">
+                                    <i class="fa-regular fa-copy"></i>
+                                    <span data-i18n="copyWeChatBtn">一键复制微信号</span>
+                                </button>
+                            </div>
+                        </div>
 
-                    const bldgMat = new THREE.MeshStandardMaterial({
-                        color: 0x060913,
-                        roughness: 0.4,
-                        metalness: 0.8
-                    });
+                        <div class="pt-6 border-t border-slate-100 mt-6 text-xs text-slate-500 flex items-center justify-between">
+                            <span><i class="fa-solid fa-check text-emerald-500 mr-1"></i> 支持中英越多语沟通</span>
+                            <span><i class="fa-solid fa-check text-emerald-500 mr-1"></i> 免费发图排版</span>
+                        </div>
+                    </div>
 
-                    const building = new THREE.Mesh(bldgGeo, bldgMat);
-                    building.scale.set(width, height, depth);
-                    building.position.set(x, height / 2 - 3, z);
-                    buildingGroup.add(building);
+                    <!-- Direct Telephone Card -->
+                    <div class="bg-white p-8 rounded-3xl border-2 border-blue-500/40 shadow-lg relative flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-brand-navy rounded-full text-xs font-extrabold">
+                                    <i class="fa-solid fa-phone"></i> <span data-i18n="directPhoneTag">24H 电话直连</span>
+                                </div>
+                                <span class="text-xs font-bold text-slate-400" data-i18n="directCallTitle">工厂经理直通车</span>
+                            </div>
 
-                    if (Math.random() > 0.4) {
-                        const neonGeo = new THREE.BoxGeometry(width + 0.2, 1, depth + 0.2);
-                        const neonMat = new THREE.MeshBasicMaterial({
-                            color: [0x00f0ff, 0xff00a0, 0x7000ff, 0xffea00][Math.floor(Math.random() * 4)]
-                        });
-                        const neon = new THREE.Mesh(neonGeo, neonMat);
-                        neon.position.set(x, height - 2, z);
-                        buildingGroup.add(neon);
-                    }
-                }
-                this.scene.add(buildingGroup);
+                            <h3 class="text-2xl font-extrabold text-slate-900" data-i18n="phoneCardTitle">电话直接联系 (Direct Phone Call)</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed" data-i18n="phoneCardDesc">
+                                紧急订单、大宗批发或特殊工艺咨询，欢迎直接拨打工厂热线电话，与小榄供应链负责人直接洽谈。
+                            </p>
 
-                const starsGeo = new THREE.BufferGeometry();
-                const count = 1200;
-                const positions = new Float32Array(count * 3);
+                            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between">
+                                <div>
+                                    <div class="text-xs font-bold text-slate-500 uppercase" data-i18n="phoneCallLabel">电话号码 / Tel Line</div>
+                                    <div class="text-2xl font-black text-brand-navy tracking-wide">+86 138 0269 4295</div>
+                                </div>
+                                <a href="tel:+8613802694295" class="bg-brand-navy hover:bg-brand-navyDark text-white px-5 py-3 rounded-xl font-bold text-xs shadow transition-all flex items-center gap-2">
+                                    <i class="fa-solid fa-phone-flip"></i>
+                                    <span data-i18n="callNowBtn">直接拨打电话</span>
+                                </a>
+                            </div>
+                        </div>
 
-                for (let i = 0; i < count * 3; i += 3) {
-                    positions[i] = (Math.random() - 0.5) * 500;
-                    positions[i + 1] = Math.random() * 200 + 20;
-                    positions[i + 2] = (Math.random() - 0.5) * 500;
-                }
+                        <div class="pt-6 border-t border-slate-100 mt-6 text-xs text-slate-500 flex items-center justify-between">
+                            <span><i class="fa-solid fa-check text-emerald-500 mr-1"></i> 7x24 小时电话响应</span>
+                            <span><i class="fa-solid fa-check text-emerald-500 mr-1"></i> 立即沟通定制细节</span>
+                        </div>
+                    </div>
 
-                starsGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                const starsMat = new THREE.PointsMaterial({
-                    color: 0xffffff,
-                    size: 0.8,
-                    transparent: true,
-                    opacity: 0.7
-                });
-                const starField = new THREE.Points(starsGeo, starsMat);
-                this.scene.add(starField);
+                </div>
+
+                <!-- Secondary Info Cards -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-teal-100 text-brand-teal flex items-center justify-center text-2xl shrink-0">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-slate-400 uppercase" data-i18n="addrTitle">Address</div>
+                            <div class="text-base font-bold text-slate-800" data-i18n="addrText">Xiaolan Town, Zhongshan City, Guangdong, China</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl shrink-0">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-slate-400 uppercase" data-i18n="hoursTitle">Working Hours</div>
+                            <div class="text-base font-bold text-slate-800">Monday - Sunday: 7:30 AM - 6:00 PM (GMT+8)</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Floating Action Quick Buttons (FAB) for WeChat & Tel -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+        <!-- WeChat Floating FAB with Popover Hint -->
+        <div class="relative group">
+            <div class="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex bg-slate-900 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-xl whitespace-nowrap items-center gap-1.5">
+                <i class="fa-brands fa-weixin text-emerald-400"></i> WeChat ID: 13802694295 (Click to Copy)
+            </div>
+            <button onclick="copyWeChat('13802694295')" class="w-14 h-14 bg-brand-wechat hover:bg-brand-wechatHover text-white rounded-full shadow-2xl flex items-center justify-center text-2xl transition-all transform hover:scale-110 border-2 border-white">
+                <i class="fa-brands fa-weixin"></i>
+            </button>
+        </div>
+
+        <!-- Phone Floating FAB -->
+        <div class="relative group">
+            <div class="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex bg-slate-900 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-xl whitespace-nowrap items-center gap-1.5">
+                <i class="fa-solid fa-phone text-cyan-400"></i> Direct Call: +86 138 0269 4295
+            </div>
+            <a href="tel:+8613802694295" class="w-14 h-14 bg-brand-navy hover:bg-brand-navyDark text-white rounded-full shadow-2xl flex items-center justify-center text-xl transition-all transform hover:scale-110 border-2 border-white">
+                <i class="fa-solid fa-phone"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
+                <div>
+                    <div class="text-white font-bold text-lg mb-1">ShunXiang Packaging (顺祥胶袋包装)</div>
+                    <p class="text-slate-400 max-w-md" data-i18n="footDesc">Your trusted B2B partner for custom plastic bags, stretch films, and industrial protective packaging in China.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="copyWeChat('13802694295')" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-brand-wechat text-white flex items-center gap-2 transition-colors font-bold text-xs">
+                        <i class="fa-brands fa-weixin text-base"></i> WeChat ID: 13802694295
+                    </button>
+                    <a href="tel:+8613802694295" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-brand-navy text-white flex items-center gap-2 transition-colors font-bold text-xs">
+                        <i class="fa-solid fa-phone text-base"></i> Tel: +86 138 0269 4295
+                    </a>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-500">
+                <div>© 2026 ShunXiang Packaging. All Rights Reserved. Xiaolan, Zhongshan, Guangdong.</div>
+                <div class="flex gap-4">
+                    <a href="#home" class="hover:text-slate-300">Privacy Policy</a>
+                    <a href="#home" class="hover:text-slate-300">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Translations & Interaction Functions -->
+    <script>
+        // Multi-language Translation Dictionary
+        const translations = {
+            zh: {
+                topBarDuty: "支持 Form E / RCEP 关税优惠证书（享 0-5% 进口关税）",
+                topBarDDP: "支持东南亚及全球 DDP 双清含税送到门服务",
+                logoSub: "顺祥胶袋包装 / ShunXiang",
+                headWeChatBtn: "添加微信咨询",
+                navHome: "首页",
+                navProducts: "产品中心",
+                navAdvantages: "核心优势",
+                navAbout: "关于顺祥",
+                navContact: "联系我们",
+                wechatCallBtn: "微信咨询",
+                phoneCallBtn: "电话直连",
+                heroTag: "源头工厂直供 • 中山小榄扎实供应链",
+                heroTitle: "一站式软包装与工业包装出海解决方案",
+                heroDesc: "为全球跨境电商、服装品牌及工业客户提供高品质拉伸膜、CPE磨砂拉链袋、PE/PO平口袋及气泡缓冲袋。",
+                heroBadge1: "小批量定制 Logo",
+                heroBadge2: "100% 全新料加厚抗爆",
+                heroBadge3: "Form E 关税减免",
+                heroBadge4: "东南亚/中东 DDP 到门",
+                heroBtnWeChat: "微信咨询: 13802694295",
+                heroBtnPhone: "电话直连: +86 138 0269 4295",
+                directContactTitle: "官方微信与电话快速通道",
+                directContactDesc: "欢迎随时通过微信或电话与我们位于中山小榄的生产团队沟通，获取即时报价与样品寄送服务。",
+                wechatLabel: "微信咨询号 (点击复制)",
+                copyBtnText: "点击复制",
+                phoneLabel: "24小时电话热线 (点击拨打)",
+                callBtnText: "拨打电话",
+                viewContactBtn: "查看详细工厂地址与联系说明",
+                stat1: "全新料高品质",
+                stat2: "小批量可起订",
+                stat3: "Form E 零关税",
+                stat4: "高效交期",
+                prodSubTitle: "全品类软包装耗材供应",
+                prodMainTitle: "工业包装与定制胶袋系列",
+                prodDesc: "高透明度、强拉伸力、高承重力，完全支持根据品牌需求定制尺寸、厚度及 Logo 印刷。",
+                p1Title: "拉伸膜 / 缠绕膜",
+                p1Desc: "手用及机用 LLDPE 工业缠绕膜。具备高抗穿刺性、强自粘性及超强拉伸力，卡板打包及卡板缠绕必备。",
+                p1Spec1: "厚度: 15 - 50 微米 (Micron)",
+                p1Spec2: "颜色: 透明、黑色、蓝色",
+                p2Title: "打包带 (PET / PP)",
+                p2Desc: "高强度 PET 与 PP 工业打包带，专为纸箱、木材及重型机械捆扎设计。兼容手用及全自动打包机。",
+                p2Spec1: "材质: 高拉力 PP / PET",
+                p2Spec2: "支持定制宽度与颜色",
+                p3Title: "EPE 珍珠棉及袋",
+                p3Desc: "防刮花、防震动 EPE 珍珠棉板材、卷材及卷袋。为五金件、灯饰、电子元器件及易碎品提供缓冲保护。",
+                p3Spec1: "定制厚度与冲切成型",
+                p3Spec2: "可做防静电及防水加厚款",
+                p4Title: "封箱胶带 / BOPP 胶带",
+                p4Desc: "高粘度亚克力水性胶 BOPP 封箱胶带。提供透明、黄色、警示印刷及定制企业 Logo 品牌胶带。",
+                p4Spec1: "强粘力、耐候性佳",
+                p4Spec2: "支持彩色 Logo 印刷定制",
+                p5Title: "气泡袋 / 气泡信封袋",
+                p5Desc: "缓冲防震气泡袋与带破坏性强力自粘胶的气泡信封袋。跨境电商寄送、美妆及电子小件保护标配。",
+                p5Spec1: "破坏性封口强力胶舌",
+                p5Spec2: "减震气泡密集缓冲",
+                p6Title: "PE 胶袋 (平口袋/自封袋)",
+                p6Desc: "高透明度 LDPE / HDPE 平口袋、骨袋（自封袋）及服装排气孔袋。全新料无异味，适合工业分装与日用。",
+                p6Spec1: "封边牢固抗爆边",
+                p6Spec2: "支持打排气孔与警告语印刷",
+                p7Title: "PO 胶袋 (高强耐用)",
+                p7Desc: "高拉力 PO（HDPE）胶袋，手感平整有脆度。经济实惠，广泛用于服装打孔袋、手提袋及工业内衬套袋。",
+                p7Spec1: "高硬度、高承重",
+                p7Spec2: "大批量高性价比选择",
+                p8Title: "CPE 磨砂拉链袋",
+                p8Desc: "触感柔和的高级磨砂拉链袋/贴骨袋。全球服装品牌、内衣、泳衣及鞋靴出厂包装热销爆款。",
+                p8Spec1: "柔和磨砂质感防刮花",
+                p8Spec2: "定制 Logo 印刷与气孔",
+                p9Title: "定制各种胶袋 (OEM/ODM)",
+                p9Desc: "全方位定制袋型、尺寸、厚度、手提孔及多色印刷。可根据要求提供可降解（PLA/PBAT）环保胶袋。",
+                p9Spec1: "低起订量 3,000 个起",
+                p9Spec2: "免费设计排版与样品确认",
+                prodInquireWeChat: "微信询价",
+                prodInquirePhone: "电话咨询",
+                advSubTitle: "为什么海外买家选择顺祥胶袋",
+                advMainTitle: "专为出口与轻资产采购打造",
+                adv1Title: "小批量定制低门槛",
+                adv1Desc: "定制 Logo 印刷仅需 3,000 个起订，助力初创电商与中小服装品牌轻资产起步。",
+                adv2Title: "Form E / RCEP 0关税",
+                adv2Desc: "协助办理官方东盟 Form E 与 RCEP 原产地证，直接降低进口关税 5%-10%。",
+                adv3Title: "DDP 双清含税送到门",
+                adv3Desc: "熟练提供发往越南、泰国、印尼、马来及中东的 DDP 包税专线，无清关烦恼。",
+                adv4Title: "小榄本土扎实供应链",
+                adv4Desc: "依靠中山小榄及珠三角强大吹膜、印刷产能，确保源头竞争力的低价与品质。",
+                aboutTag: "关于顺祥胶袋包装",
+                aboutTitle: "您在中山小榄值得信赖的软包装合作伙伴",
+                aboutP1: "顺祥胶袋包装（ShunXiang Packaging）采用灵活的“前店后厂”轻资产模式。立足于中国制造重镇——广东省中山市小榄镇，专注工业包装与客制化胶袋的出海服务。",
+                aboutP2: "与传统工厂不同，我们更懂海外买家需求：响应迅速、支持小批量、提供多语言沟通及清关到门一站式服务。",
+                aboutStat1Title: "聚焦全球市场",
+                aboutStat1Desc: "东南亚、中东、欧美及全球各地",
+                aboutStat2Title: "快速交付周期",
+                aboutStat2Desc: "3-5天打样，7-10天大货",
+                aboutStat3Title: "灵活服务团队",
+                aboutStat3Desc: "支持小单定制及 OEM/ODM",
+                aboutStat4Title: "关税优惠单证",
+                aboutStat4Desc: "支持 Form E, RCEP 产地证",
+                contactSubTitle: "联系我们",
+                contactMainTitle: "微信与电话优先对接通道",
+                contactDesc: "承接国内外订单与大宗采购，建议优先使用微信或者直接拨打电话沟通交流！",
+                recContactTag: "推荐联系方式",
+                instantResponse: "即时在线回复",
+                wechatCardTitle: "微信沟通咨询 (WeChat)",
+                wechatCardDesc: "添加工厂官方微信，快速发送样品图、规格式样、设计排版稿及批量采购报价。",
+                wechatIdLabel: "微信号 / WeChat ID",
+                copyWeChatBtn: "一键复制微信号",
+                directPhoneTag: "24H 电话直连",
+                directCallTitle: "工厂经理直通车",
+                phoneCardTitle: "电话直接联系 (Call)",
+                phoneCardDesc: "紧急订单、大宗批发或特殊工艺咨询，欢迎直接拨打工厂热线电话，与小榄供应链负责人洽谈。",
+                phoneCallLabel: "电话号码 / Tel Line",
+                callNowBtn: "直接拨打电话",
+                addrTitle: "工厂 / 办公地址",
+                addrText: "中国广东省中山市小榄镇",
+                hoursTitle: "营业时间",
+                footDesc: "中国优质塑料胶袋、拉伸膜及工业防护包装一站式 B2B 供应商。"
+            },
+            en: {
+                topBarDuty: "Form E & RCEP 0-5% Duty-Free Certificate Supported",
+                topBarDDP: "DDP Shipping to SE Asia & Worldwide",
+                logoSub: "Packaging / 顺祥胶袋包装",
+                headWeChatBtn: "Add WeChat",
+                navHome: "Home",
+                navProducts: "Products",
+                navAdvantages: "Why Us",
+                navAbout: "About Us",
+                navContact: "Contact",
+                wechatCallBtn: "WeChat",
+                phoneCallBtn: "Phone Call",
+                heroTag: "Direct Factory Supply • Xiaolan, China",
+                heroTitle: "One-Stop Flexible & Industrial Packaging Solutions",
+                heroDesc: "Empowering global e-commerce, garment, and industrial clients with premium stretch film, custom poly bags, CPE zipper pouches, and eco-friendly mailers.",
+                heroBadge1: "Low MOQ Custom Logo",
+                heroBadge2: "High Tensile & Tear Resistant",
+                heroBadge3: "0% Tariff Clearances",
+                heroBadge4: "Southeast Asia & Global",
+                heroBtnWeChat: "WeChat: 13802694295",
+                heroBtnPhone: "Call Us: +86 138 0269 4295",
+                directContactTitle: "Direct WeChat & Telephone Channels",
+                directContactDesc: "Connect directly with our Xiaolan supply team via WeChat or Phone for instant inquiries, samples, and customized solutions.",
+                wechatLabel: "WeChat ID (Click to Copy)",
+                copyBtnText: "Copy ID",
+                phoneLabel: "24H Phone Hotlines (Click to Call)",
+                callBtnText: "Call Now",
+                viewContactBtn: "View All Contact Details & Location",
+                stat1: "Virgin Material Quality",
+                stat2: "Low Custom MOQ",
+                stat3: "ASEAN Form E Tariff",
+                stat4: "Fast Lead Time",
+                prodSubTitle: "Full Spectrum Packaging Supplies",
+                prodMainTitle: "Industrial & Custom Packaging Products",
+                prodDesc: "High durability, clear transparency, heavy loading capacity, and fully customizable for your brand requirements.",
+                p1Title: "Stretch Film (拉伸膜)",
+                p1Desc: "Hand & machine grade LLDPE stretch film. High puncture resistance, superior stretchability, and strong self-adhesion for pallet wrapping.",
+                p1Spec1: "Thickness: 15 - 50 Micron",
+                p1Spec2: "Color: Clear, Black, Blue",
+                p2Title: "Strapping Band (打包带)",
+                p2Desc: "Heavy-duty PET & PP strapping belts for bundling cartons, timber, and heavy machinery.",
+                p2Spec1: "Material: High Tensile PP / PET",
+                p2Spec2: "Custom Widths & Colors",
+                p3Title: "EPE Pearl Cotton Foam (珍珠棉)",
+                p3Desc: "Shockproof, anti-scratch EPE foam sheets, rolls, and bags. Essential protection for hardware and electronics.",
+                p3Spec1: "Custom Thickness & Foam Die-cuts",
+                p3Spec2: "Waterproof & Anti-Static Options",
+                p4Title: "Sealing Tape / BOPP Tape (封箱胶)",
+                p4Desc: "Strong acrylic adhesive BOPP carton sealing tape. Available in clear, tan, fragile warning print, and logo printing.",
+                p4Spec1: "Strong Adhesion & Weatherproof",
+                p4Spec2: "Custom Brand Logo Printing",
+                p5Title: "Bubble Mailers & Bags (气泡袋)",
+                p5Desc: "Protective bubble wrap pouches and metallic/poly bubble mailers with self-adhesive destructive glue.",
+                p5Spec1: "Tamper-Evident Strong Adhesive",
+                p5Spec2: "Shockproof Air Bubble Cushioning",
+                p6Title: "PE Poly Bags (PE 胶袋)",
+                p6Desc: "High clarity LDPE / HDPE flat poly bags, ziplock bags, and hole-punched garment bags. Non-toxic, virgin material.",
+                p6Spec1: "Tough Sealing & Anti-Bursting",
+                p6Spec2: "Air-hole Ventilation Punching",
+                p7Title: "PO Poly Bags (PO 胶袋)",
+                p7Desc: "High tensile strength PO (HDPE blend) bags with a crisp feel. Economical choice for apparel.",
+                p7Spec1: "High Stiffness & Load Capacity",
+                p7Spec2: "Cost-Effective Bulk Packaging",
+                p8Title: "CPE Frosted Zipper Bags (CPE 磨砂拉链袋)",
+                p8Desc: "Premium silky-soft frosted finish zipper pouches. Highly popular for fashion brands, swimwear, and footwear.",
+                p8Spec1: "Elegant Soft Touch & Anti-Scratch",
+                p8Spec2: "Custom Brand Logo & Vent Hole",
+                p9Title: "Custom Printed Poly Bags (定制各种胶袋)",
+                p9Desc: "Fully customized sizes, colors, thickness, handle cutouts, and multi-color logo printing.",
+                p9Spec1: "Low MOQ Starts from 3,000 Pcs",
+                p9Spec2: "Free Artwork Proof & Design Guidance",
+                prodInquireWeChat: "WeChat Quote",
+                prodInquirePhone: "Phone Call",
+                advSubTitle: "Why Global Traders Choose ShunXiang",
+                advMainTitle: "Tailored For Export & Low-Barrier Import",
+                adv1Title: "Low MOQ Customization",
+                adv1Desc: "Custom logo printing starts from only 3,000 pieces. Perfect for growing e-commerce brands.",
+                adv2Title: "Form E & RCEP Duty-Free",
+                adv2Desc: "We provide official ASEAN Form E and RCEP certificates of origin for tariff reductions.",
+                adv3Title: "DDP Door-to-Door Logistics",
+                adv3Desc: "Stress-free DDP shipping to Vietnam, Thailand, Indonesia, Malaysia, and Middle East with full customs clearance.",
+                adv4Title: "Xiaolan Supply Chain",
+                adv4Desc: "Direct access to Zhongshan Xiaolan's robust raw material and manufacturing network.",
+                aboutTag: "About ShunXiang Packaging",
+                aboutTitle: "Your Reliable Flexible Packaging Partner in Xiaolan",
+                aboutP1: "ShunXiang Packaging operates with an agile supply chain model rooted in Xiaolan Town, Zhongshan, Guangdong.",
+                aboutP2: "We prioritize flexibility: low MOQs, rapid sample delivery, multi-lingual client support via WeChat.",
+                aboutStat1Title: "Global Focus",
+                aboutStat1Desc: "SE Asia, Middle East, Europe & Americas",
+                aboutStat2Title: "Quick Turnaround",
+                aboutStat2Desc: "3-5 Days Sample, 7-10 Days Bulk",
+                aboutStat3Title: "Agile Partner",
+                aboutStat3Desc: "Small Orders & OEM Customized",
+                aboutStat4Title: "Duty Free Docs",
+                aboutStat4Desc: "Form E, RCEP, Commercial Invoice",
+                contactSubTitle: "Get In Touch",
+                contactMainTitle: "WeChat & Phone Contact Channels",
+                contactDesc: "Discuss global or domestic business. Feel free to call us or add us on WeChat!",
+                recContactTag: "Recommended Option",
+                instantResponse: "Instant Online Reply",
+                wechatCardTitle: "WeChat Consultation",
+                wechatCardDesc: "Add our official WeChat to send artwork, specs, sample requests, and receive fast wholesale quotations.",
+                wechatIdLabel: "WeChat ID",
+                copyWeChatBtn: "Copy WeChat ID",
+                directPhoneTag: "24H Phone Line",
+                directCallTitle: "Direct Supply Manager",
+                phoneCardTitle: "Direct Telephone Call",
+                phoneCardDesc: "For urgent inquiries, wholesale orders, or custom specs, call our factory management line directly.",
+                phoneCallLabel: "Telephone Line",
+                callNowBtn: "Call Now",
+                addrTitle: "Address",
+                addrText: "Xiaolan Town, Zhongshan City, Guangdong Province, China",
+                hoursTitle: "Working Hours",
+                footDesc: "Your trusted B2B partner for custom plastic bags, stretch films, and industrial protective packaging in China."
+            },
+            vi: {
+                topBarDuty: "Hỗ trợ Form E & RCEP (Miễn/Giảm thuế 0-5%)",
+                topBarDDP: "Giao DDP bao thuế tận nơi đến Việt Nam & Toàn cầu",
+                logoSub: "Packaging / Bao Bì Thuận Tường",
+                headWeChatBtn: "Thêm WeChat",
+                navHome: "Trang chủ",
+                navProducts: "Sản phẩm",
+                navAdvantages: "Ưu điểm",
+                navAbout: "Về chúng tôi",
+                navContact: "Liên hệ",
+                wechatCallBtn: "Tư vấn WeChat",
+                phoneCallBtn: "Gọi điện ngay",
+                heroTag: "Cung cấp trực tiếp từ xưởng • Tiểu Lam, Trung Quốc",
+                heroTitle: "Giải Pháp Màng Bọc & Bao Bì Nhựa Công Nghiệp Trọn Gói",
+                heroDesc: "Chuyên cung cấp màng co, túi zipper CPE mờ, túi PE/PO và túi khí bảo vệ cho thương mại điện tử và may mặc toàn cầu.",
+                heroBadge1: "MOQ Thấp In Logo Custom",
+                heroBadge2: "100% Chất Liệu Nguyên Sinh",
+                heroBadge3: "Hỗ Trợ Miễn Thuế Form E",
+                heroBadge4: "Giao DDP Tận Nơi Đông Nam Á",
+                heroBtnWeChat: "Tư vấn WeChat: 13802694295",
+                heroBtnPhone: "Gọi điện ngay: +86 138 0269 4295",
+                directContactTitle: "Kênh Kết Nối WeChat & Điện Thoại Trực Tiếp",
+                directContactDesc: "Liên hệ trực tiếp với xưởng sản xuất tại Tiểu Lam qua WeChat hoặc điện thoại để nhận báo giá và mẫu ngay lập tức.",
+                wechatLabel: "Số WeChat (Nhấp để sao chép)",
+                copyBtnText: "Sao chép ID",
+                phoneLabel: "Hotline 24/7 (Nhấp để gọi)",
+                callBtnText: "Gọi điện ngay",
+                viewContactBtn: "Xem địa chỉ xưởng & thông tin chi tiết",
+                stat1: "100% Nguyên Sinh",
+                stat2: "MOQ Nhỏ Nhận In",
+                stat3: "Thuế Form E 0-5%",
+                stat4: "Giao Hàng Nhanh",
+                prodSubTitle: "Danh Mục Bao Bì Đầy Đủ",
+                prodMainTitle: "Sản Phẩm Bao Bì Nhựa & Công Nghiệp",
+                prodDesc: "Độ bền cao, độ trong suốt rõ nét, chịu lực tốt và tùy chỉnh theo yêu cầu thương hiệu.",
+                prodInquireWeChat: "Báo giá WeChat",
+                prodInquirePhone: "Gọi điện tư vấn",
+                recContactTag: "Khuyên dùng",
+                instantResponse: "Phản hồi trực tuyến ngay",
+                wechatCardTitle: "Tư vấn qua WeChat",
+                wechatCardDesc: "Thêm WeChat xưởng để gửi thiết kế, yêu cầu mẫu và nhận báo giá bán buôn nhanh chóng.",
+                wechatIdLabel: "Mã WeChat ID",
+                copyWeChatBtn: "Sao chép WeChat ID",
+                directPhoneTag: "Hotline 24H",
+                directCallTitle: "Quản lý xưởng trực tiếp",
+                phoneCardTitle: "Gọi điện thoại trực tiếp",
+                phoneCardDesc: "Liên hệ đơn hàng gấp hoặc thảo luận quy cách kỹ thuật trực tiếp với quản lý xưởng.",
+                phoneCallLabel: "Số điện thoại",
+                callNowBtn: "Gọi ngay bây giờ",
+                addrTitle: "Địa chỉ",
+                addrText: "Thị trấn Tiểu Lam, Thành phố Trung Sơn, Tỉnh Quảng Đông, Trung Quốc",
+                hoursTitle: "Giờ làm việc",
+                footDesc: "Nhà cung cấp bao bì nhựa, màng co và vật liệu đóng gói uy tín tại Trung Quốc."
+            },
+            th: {
+                topBarDuty: "รองรับใบรับรอง Form E & RCEP (ภาษีนำเข้า 0-5%)",
+                topBarDDP: "บริการส่ง DDP รวมภาษีถึงประตูบ้านในไทยและทั่วโลก",
+                logoSub: "Packaging / ชุนเซียง แพคเกจจิ้ง",
+                headWeChatBtn: "แอด WeChat",
+                navHome: "หน้าแรก",
+                navProducts: "สินค้า",
+                navAdvantages: "จุดเด่น",
+                navAbout: "เกี่ยวกับเรา",
+                navContact: "ติดต่อเรา",
+                wechatCallBtn: "คุย WeChat",
+                phoneCallBtn: "โทรทันที",
+                heroTag: "ส่งตรงจากโรงงาน • เมืองเสี่ยวหลาน ประเทศจีน",
+                heroTitle: "ผู้ให้บริการถุงพลาสติกและฟิล์มยืดอุตสาหกรรมครบวงจร",
+                heroDesc: "ผลิตและจำหน่ายฟิล์มยืดพันพาเลท ถุงซิปล็อค CPE เนื้อทราย ถุง PE/PO และซองกันกระแทก",
+                heroBadge1: "ขั้นต่ำน้อย สกรีนโลโก้ได้",
+                heroBadge2: "เม็ดพลาสติกใหม่ 100%",
+                heroBadge3: "รองรับ Form E ลดภาษี 0%",
+                heroBadge4: "ส่ง DDP ถึงหน้าบ้านในไทย",
+                heroBtnWeChat: "คุย WeChat: 13802694295",
+                heroBtnPhone: "โทรตรง: +86 138 0269 4295",
+                directContactTitle: "ช่องทาง WeChat และโทรศัพท์โดยตรง",
+                directContactDesc: "ติดต่อทีมงานฝ่ายผลิตในเสี่ยวหลานเพื่อสอบถามรายละเอียด ขอตัวอย่าง และขอใบเสนอราคาได้ทันที",
+                wechatLabel: "WeChat ID (คลิกเพื่อคัดลอก)",
+                copyBtnText: "คัดลอก ID",
+                phoneLabel: "สายด่วน 24 ชั่วโมง (คลิกเพื่อโทร)",
+                callBtnText: "โทรออก",
+                viewContactBtn: "ดูที่อยู่โรงงานและรายละเอียดการติดต่อ",
+                stat1: "พลาสติกใหม่ 100%",
+                stat2: "MOQ เริ่มต้นน้อย",
+                stat3: "ภาษี Form E 0-5%",
+                stat4: "จัดส่งรวดเร็ว",
+                prodSubTitle: "สินค้าบรรจุภัณฑ์ครบวงจร",
+                prodMainTitle: "ถุงพลาสติกและบรรจุภัณฑ์อุตสาหกรรม",
+                prodDesc: "ความทนทานสูง ความใสชัดเจน รองรับน้ำหนักได้ดี ปรับแต่งได้ตามต้องการ",
+                prodInquireWeChat: "ขอราคาผ่าน WeChat",
+                prodInquirePhone: "โทรสอบถาม",
+                recContactTag: "แนะนำหลัก",
+                instantResponse: "ตอบกลับออนไลน์ทันที",
+                wechatCardTitle: "ปรึกษาผ่าน WeChat",
+                wechatCardDesc: "แอด WeChat โรงงานเพื่อส่งไฟล์สกรีน ตรวจแบบ และขอราคาส่งได้อย่างรวดเร็ว",
+                wechatIdLabel: "WeChat ID",
+                copyWeChatBtn: "คัดลอก WeChat ID",
+                directPhoneTag: "สายด่วน 24 ชม.",
+                directCallTitle: "ผู้จัดการโรงงานโดยตรง",
+                phoneCardTitle: "โทรศัพท์ติดต่อโดยตรง",
+                phoneCardDesc: "สำหรับออเดอร์ด่วน งานสั่งทำพิเศษ หรือสั่งซื้อจำนวนมาก โทรคุยกับผู้จัดการโรงงานได้โดยตรง",
+                phoneCallLabel: "เบอร์โทรศัพท์",
+                callNowBtn: "โทรทันที",
+                addrTitle: "ที่อยู่โรงงาน",
+                addrText: "เมืองเสี่ยวหลาน เมืองตงซาน มณฑลกวางตุ้ง ประเทศจีน",
+                hoursTitle: "เวลาทำการ",
+                footDesc: "ผู้ผลิตและส่งออกถุงพลาสติก ฟิล์มยืด และบรรจุภัณฑ์กันกระแทกคุณภาพสูงจากจีน"
+            },
+            id: {
+                topBarDuty: "Sertifikat Form E & RCEP (Bebas Bea 0-5%) Supported",
+                topBarDDP: "Pengiriman DDP Sampai Rumah di Indonesia & Global",
+                logoSub: "Packaging / Kemasan ShunXiang",
+                headWeChatBtn: "Tambah WeChat",
+                navHome: "Beranda",
+                navProducts: "Produk",
+                navAdvantages: "Keunggulan",
+                navAbout: "Tentang Kami",
+                navContact: "Kontak",
+                wechatCallBtn: "WeChat",
+                phoneCallBtn: "Telepon",
+                heroTag: "Pasokan Langsung Pabrik • Xiaolan, Tiongkok",
+                heroTitle: "Solusi Kemasan Plastik & Industri Terpadu",
+                heroDesc: "Menyediakan stretch film, kantong ziplock CPE frosted, kantong PE/PO, dan bubble mailer untuk e-commerce dan industri.",
+                heroBadge1: "MOQ Rendah Cetak Logo",
+                heroBadge2: "100% Bahan Virgin Premium",
+                heroBadge3: "Dukungan Bebas Bea Form E",
+                heroBadge4: "Pengiriman DDP Sampai Tempat",
+                heroBtnWeChat: "Konsultasi WeChat: 13802694295",
+                heroBtnPhone: "Telepon Langsung: +86 138 0269 4295",
+                directContactTitle: "Saluran Kontak WeChat & Telepon Langsung",
+                directContactDesc: "Hubungi tim pabrik Xiaolan kami secara langsung melalui WeChat atau telepon untuk mendapatkan penawaran harga dan sampel secara cepat.",
+                wechatLabel: "WeChat ID (Klik untuk Salin)",
+                copyBtnText: "Salin ID",
+                phoneLabel: "Hotline 24 Jam (Klik untuk Telepon)",
+                callBtnText: "Telepon Sekarang",
+                viewContactBtn: "Lihat Lokasi & Detail Kontak Pabrik",
+                stat1: "100% Bahan Virgin",
+                stat2: "MOQ Custom Rendah",
+                stat3: "Tarif Form E 0-5%",
+                stat4: "Pengiriman Cepat",
+                prodSubTitle: "Katalog Kemasan Lengkap",
+                prodMainTitle: "Produk Plastik & Kemasan Industri",
+                prodDesc: "Daya tahan tinggi, transparansi jernih, kuat menahan beban, dan dapat disesuaikan sepenuhnya.",
+                prodInquireWeChat: "Harga via WeChat",
+                prodInquirePhone: "Tanya via Telepon",
+                recContactTag: "Rekomendasi Utama",
+                instantResponse: "Respon Cepat Online",
+                wechatCardTitle: "Konsultasi WeChat",
+                wechatCardDesc: "Tambahkan WeChat resmi pabrik untuk mengirimkan desain, sampel, dan penawaran grosir.",
+                wechatIdLabel: "WeChat ID",
+                copyWeChatBtn: "Salin WeChat ID",
+                directPhoneTag: "Hotline 24 Jam",
+                directCallTitle: "Manajer Pabrik Langsung",
+                phoneCardTitle: "Panggilan Telepon Langsung",
+                phoneCardDesc: "Untuk pesanan mendesak atau pesanan grosir jumlah besar, silakan hubungi saluran manajemen pabrik secara langsung.",
+                phoneCallLabel: "Nomor Telepon",
+                callNowBtn: "Telepon Sekarang",
+                addrTitle: "Alamat",
+                addrText: "Kota Xiaolan, Kota Zhongshan, Provinsi Guangdong, Tiongkok",
+                hoursTitle: "Jam Kerja",
+                footDesc: "Pemasok terpercaya untuk kantong plastik, stretch film, dan kemasan pelindung industri."
             }
-
-            bindEvents() {
-                window.addEventListener('resize', () => {
-                    this.camera.aspect = window.innerWidth / window.innerHeight;
-                    this.camera.updateProjectionMatrix();
-                    this.renderer.setSize(window.innerWidth, window.innerHeight);
-                });
-            }
-
-            animate() {
-                requestAnimationFrame(() => this.animate());
-
-                const delta = this.clock.getDelta();
-
-                this.facadeGen.update(delta);
-                this.facadeTexture.needsUpdate = true;
-
-                this.sphereMaterial.emissiveIntensity = this.facadeGen.params.intensity;
-                
-                // Color synchronization
-                const preset = this.facadeGen.currentPreset;
-                if (preset === 'halloween') {
-                    this.spherePointLight.color.setHex(0xff5500);
-                    this.glowMesh.material.color.setHex(0xff5500);
-                } else if (preset === 'christmas') {
-                    this.spherePointLight.color.setHex(0x52c41a);
-                    this.glowMesh.material.color.setHex(0x52c41a);
-                } else if (preset === 'mid_autumn') {
-                    this.spherePointLight.color.setHex(0xffea00);
-                    this.glowMesh.material.color.setHex(0xffea00);
-                } else if (preset === 'valentine') {
-                    this.spherePointLight.color.setHex(0xff0054);
-                    this.glowMesh.material.color.setHex(0xff0054);
-                } else if (preset === 'lantern') {
-                    this.spherePointLight.color.setHex(0xd90429);
-                    this.glowMesh.material.color.setHex(0xd90429);
-                } else if (preset === 'emoji') {
-                    this.spherePointLight.color.setHex(0xffea00);
-                    this.glowMesh.material.color.setHex(0xffea00);
-                } else {
-                    this.spherePointLight.color.setStyle(this.facadeGen.params.color1);
-                    this.glowMesh.material.color.setStyle(this.facadeGen.params.color1);
-                }
-
-                this.controls.update();
-                this.renderer.render(this.scene, this.camera);
-            }
-        }
-
-        // --- 4. UI Bindings ---
-        window.onload = () => {
-            const app = new VegasSphereScene();
-
-            const presetButtons = document.querySelectorAll('.preset-btn');
-            const customPanel = document.getElementById('custom-panel');
-            const emojiDrawer = document.getElementById('emoji-drawer');
-            const emojiSubButtons = document.querySelectorAll('.emoji-sub-btn');
-
-            presetButtons.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    presetButtons.forEach(b => b.classList.remove('active'));
-                    const targetBtn = e.currentTarget;
-                    targetBtn.classList.add('active');
-
-                    const presetKey = targetBtn.getAttribute('data-preset');
-                    app.facadeGen.currentPreset = presetKey;
-
-                    // Toggle Drawer & Panels
-                    if (presetKey === 'custom') {
-                        customPanel.classList.remove('hidden');
-                        emojiDrawer.classList.add('hidden');
-                    } else if (presetKey === 'emoji') {
-                        emojiDrawer.classList.remove('hidden');
-                        customPanel.classList.add('hidden');
-                    } else {
-                        customPanel.classList.add('hidden');
-                        emojiDrawer.classList.add('hidden');
-                    }
-                });
-            });
-
-            // Emoji Sub-pack selector
-            emojiSubButtons.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    emojiSubButtons.forEach(b => b.classList.remove('active'));
-                    const target = e.currentTarget;
-                    target.classList.add('active');
-                    app.facadeGen.activeEmoji = target.getAttribute('data-emoji');
-                });
-            });
-
-            // Audio Toggle
-            const btnAudio = document.getElementById('btn-audio');
-            const audioIcon = document.getElementById('audio-icon');
-
-            btnAudio.addEventListener('click', () => {
-                const isPlaying = audioEngine.toggle();
-                if (isPlaying) {
-                    btnAudio.classList.add('active');
-                    audioIcon.className = 'fa-solid fa-volume-high text-cyan-400';
-                } else {
-                    btnAudio.classList.remove('active');
-                    audioIcon.className = 'fa-solid fa-volume-xmark';
-                }
-            });
-
-            // Auto Rotation Toggle
-            const btnRotate = document.getElementById('btn-rotate');
-            btnRotate.addEventListener('click', () => {
-                app.controls.autoRotate = !app.controls.autoRotate;
-                if (app.controls.autoRotate) {
-                    btnRotate.classList.add('active');
-                } else {
-                    btnRotate.classList.remove('active');
-                }
-            });
-
-            // Fullscreen Toggle
-            const btnFullscreen = document.getElementById('btn-fullscreen');
-            btnFullscreen.addEventListener('click', () => {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen();
-                } else {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    }
-                }
-            });
-
-            // Custom Panel Inputs
-            const ctrlMode = document.getElementById('ctrl-mode');
-            const ctrlText = document.getElementById('ctrl-text');
-            const textGroup = document.getElementById('text-input-group');
-            const ctrlColor1 = document.getElementById('ctrl-color1');
-            const ctrlColor2 = document.getElementById('ctrl-color2');
-            const ctrlSpeed = document.getElementById('ctrl-speed');
-            const valSpeed = document.getElementById('val-speed');
-            const ctrlDensity = document.getElementById('ctrl-density');
-            const valDensity = document.getElementById('val-density');
-            const ctrlIntensity = document.getElementById('ctrl-intensity');
-            const valIntensity = document.getElementById('val-intensity');
-
-            ctrlMode.addEventListener('change', (e) => {
-                app.facadeGen.params.mode = e.target.value;
-            });
-
-            ctrlText.addEventListener('input', (e) => {
-                app.facadeGen.params.text = e.target.value || 'VEGAS';
-            });
-
-            ctrlColor1.addEventListener('input', (e) => {
-                app.facadeGen.params.color1 = e.target.value;
-            });
-
-            ctrlColor2.addEventListener('input', (e) => {
-                app.facadeGen.params.color2 = e.target.value;
-            });
-
-            ctrlSpeed.addEventListener('input', (e) => {
-                const val = parseFloat(e.target.value);
-                app.facadeGen.params.speed = val;
-                valSpeed.textContent = `${val.toFixed(1)}x`;
-            });
-
-            ctrlDensity.addEventListener('input', (e) => {
-                const val = parseInt(e.target.value);
-                app.facadeGen.params.density = val;
-                valDensity.textContent = val > 80 ? 'Ultra' : val > 48 ? 'High' : 'Medium';
-            });
-
-            ctrlIntensity.addEventListener('input', (e) => {
-                const val = parseFloat(e.target.value);
-                app.facadeGen.params.intensity = val;
-                valIntensity.textContent = val.toFixed(1);
-            });
         };
+
+        // One-click Copy WeChat Function with UI Toast Feedback
+        function copyWeChat(wechatId) {
+            // Executive fallback for document.execCommand
+            const tempInput = document.createElement('input');
+            tempInput.value = wechatId;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast(`WeChat ID: ${wechatId} Copied! (微信号已复制)`);
+            } catch (err) {
+                showToast(`WeChat ID: ${wechatId}`);
+            }
+            
+            document.body.removeChild(tempInput);
+        }
+
+        // Show Temporary Toast Message
+        function showToast(message) {
+            const toast = document.getElementById('copyToast');
+            const toastText = document.getElementById('toastText');
+            toastText.innerText = message;
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Switch Language Function
+        function changeLanguage(langKey) {
+            const data = translations[langKey] || translations.zh;
+            
+            // Loop through all data-i18n attributes and replace inner text
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (data[key]) {
+                    element.innerText = data[key];
+                }
+            });
+
+            // Save language preference in localStorage
+            localStorage.setItem('shunxiang_lang', langKey);
+        }
+
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Initialize language on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('shunxiang_lang') || 'zh';
+            const langSelect = document.getElementById('langSelect');
+            if (langSelect) {
+                langSelect.value = savedLang;
+            }
+            changeLanguage(savedLang);
+        });
     </script>
 </body>
 </html>
